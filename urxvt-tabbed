@@ -123,20 +123,23 @@ sub new_terminal {
    $rxvt;
 }
 
-my $new = new Gtk2::Frame;
-$notebook->prepend_page ($new, "New");
-
-$notebook->signal_connect_after (switch_page => sub {
-   if ($_[2] == 0) {
-      new_terminal $RXVT_BASENAME;
-   }
+#new tab button
+my $new_tab_button = Gtk2::Button->new('+');
+$new_tab_button->signal_connect (clicked => sub {
+   new_terminal $RXVT_BASENAME;
+   0
 });
+
+$notebook->set_action_widget ($new_tab_button, end);
+$new_tab_button->show();
+
+#create the initial terminal
+new_terminal $RXVT_BASENAME;
 
 $window->set_default_size (700, 400);
 $window->show_all;
 
 # ugly, but gdk_window_filters are ot available in perl
-
 Gtk2::Gdk::Event->handler_set (sub {
    my ($event) = @_;
    my $window = $event->window;
@@ -146,4 +149,3 @@ Gtk2::Gdk::Event->handler_set (sub {
 });
 
 main Gtk2;
-
