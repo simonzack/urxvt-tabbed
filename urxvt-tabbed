@@ -60,8 +60,7 @@ sub new_terminal {
 		my $win = $_[0]->window;
 
 		if (fork == 0) {
-			exec $RXVT_BASENAME,
-					  -embed => $win->get_xid, @args;
+			exec $RXVT_BASENAME, -embed => $win->get_xid, @args;
 			exit (255);
 		}
 
