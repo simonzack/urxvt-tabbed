@@ -118,6 +118,8 @@ sub new_terminal {
 
    $notebook->set_current_page ($notebook->page_num ($rxvt));
 
+   $notebook->set_tab_reorderable ($rxvt, 1);
+
    $rxvt;
 }
 
