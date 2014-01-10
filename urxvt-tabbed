@@ -58,12 +58,8 @@ sub new_terminal {
 
 	$rxvt->signal_connect_after(realize => sub {
 		my $win = $_[0]->window;
-
-		if (fork == 0) {
-			exec $RXVT_BASENAME, -embed => $win->get_xid, @args;
-			exit (255);
-		}
-
+		my $xid = $win->get_xid;
+		system "urxvt -embed $xid &";
 		0
 	});
 
