@@ -85,12 +85,11 @@ sub new_terminal {
 
 
 				if ($name eq "_NET_WM_NAME") {
-					my ($type, $format, $data)
-						= $window->property_get (
-							  $atom,
-							  Gtk2::Gdk::Atom->intern("UTF8_STRING", 0),
-							  0, 128, 0
-						  );
+					my ($type, $format, $data) = $window->property_get (
+						$atom,
+						Gtk2::Gdk::Atom->intern("UTF8_STRING", 0),
+						0, 128, 0
+					);
 
 					$label->set_text(Encode::decode_utf8 $data);
 				}
