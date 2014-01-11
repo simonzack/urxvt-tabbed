@@ -35,7 +35,7 @@ sub new_terminal {
 	my ($title, @args) = @_;
 	my $label = new Gtk2::Label $title;
 	my $rxvt = new Gtk2::Socket;
-	$rxvt->can_focus (1);
+	$rxvt->can_focus(1);
 
 	my $wm_normal_hints = sub {
 		my ($window) = @_;
@@ -77,8 +77,9 @@ sub new_terminal {
 			} elsif (Gtk2::Gdk::Event::Property:: eq ref $event) {
 				my $atom = $event->atom;
 				my $name = $atom->name;
-				return if $event->state; # GDK_PROPERTY_NEW_VALUE == 0
+				return if $event->state; #GDK_PROPERTY_NEW_VALUE == 0
 
+				#name change event
 				if ($name eq "_NET_WM_NAME") {
 					my ($type, $format, $data) = $window->property_get (
 						$atom,
