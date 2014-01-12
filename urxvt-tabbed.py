@@ -122,9 +122,9 @@ class UrxvtTab:
 			(passed to it as a command-line argument)
 		'''
 		plugged = socket.get_plug_window()
+		self.update_tab_geometry_hints()
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|gtk.gdk.PROPERTY_CHANGE_MASK)
-		self.update_tab_geometry_hints()
 		#add gdk event filters (urxvt only uses x.org, so only gdk can be used)
 		plugged.add_filter(self.on_property_notify)
 		return 0
