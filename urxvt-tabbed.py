@@ -126,19 +126,25 @@ class UrxvtTab:
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|gtk.gdk.PROPERTY_CHANGE_MASK)
 		#add gdk event filters (urxvt only uses x.org, so only gdk can be used)
-		plugged.add_filter(self.on_property_notify)
+		plugged.add_filter(self.on_gdk_property_notify)
 		return 0
 
-	def on_property_notify(self, event):
-		print(event.type)
-		if event.type == gtk.gdk.CONFIGURE:
-			self.update_tab_geometry_hints()
-		elif event.type == gtk.gdk.PROPERTY_NOTIFY:
-			if event.state == gtk.gdk.PROPERTY_NEW_VALUE:
-				if event.atom.name == '_NET_WM_NAME':
-					#window name change event
-					prop_type, prop_format, prop_data = propwindow.property_get(event.atom.name, 8)
-					self.label.set_text(prop_data)
+	def on_gdk_property_notify(self, event):
+		#due to a bug in pygtk only gtk.gdk.NOTHING is returned, so try to update the window regardless of the event
+		#	https://bugzilla.gnome.org/show_bug.cgi?id=722027
+
+		#if event.type == gtk.gdk.CONFIGURE:
+		#	self.update_tab_geometry_hints()
+		#elif event.type == gtk.gdk.PROPERTY_NOTIFY:
+		#	if event.state == gtk.gdk.PROPERTY_NEW_VALUE:
+		#		if event.atom.name == '_NET_WM_NAME':
+		#			#window name change event
+		#			prop_type, prop_format, prop_data = self.rxvt.get_plug_window().property_get(event.atom.name, 'UTF8_STRING')
+		#			self.label.set_text(prop_data)
+
+		self.update_tab_geometry_hints()
+		prop_type, prop_format, prop_data = self.rxvt.get_plug_window().property_get('_NET_WM_NAME', 'UTF8_STRING')
+		self.label.set_text(prop_data)
 		return gtk.gdk.FILTER_CONTINUE
 
 def main():
