@@ -62,10 +62,10 @@ class UrxvtTabbedWindow:
 	def add_new_terminal(self):
 		notebook = self.notebook
 		urxvt_tab = UrxvtTab()
-		notebook.append_page(urxvt_tab.rxvt, urxvt_tab.label)
-		notebook.set_current_page(notebook.page_num(urxvt_tab.rxvt))
-		notebook.set_tab_reorderable(urxvt_tab.rxvt, 1)
-		urxvt_tab.rxvt.show_all()
+		notebook.append_page(urxvt_tab.rxvt_socket, urxvt_tab.label)
+		notebook.set_current_page(notebook.page_num(urxvt_tab.rxvt_socket))
+		notebook.set_tab_reorderable(urxvt_tab.rxvt_socket, 1)
+		urxvt_tab.rxvt_socket.show_all()
 
 	def on_new_tab_click(self, widget):
 		urxvt_tab = UrxvtTab()
@@ -79,49 +79,49 @@ class UrxvtTab:
 	def __init__(self, title='urxvt'):
 		label = gtk.Label(title)
 		#embedded terminal
-		rxvt = gtk.Socket()
-		rxvt.set_can_focus(True)
-		rxvt.connect_after('realize', self.on_realize)
-		rxvt.connect_after('plug_added', self.on_plug_added)
-		rxvt.connect_after('map_event', self.on_map_event)
+		rxvt_socket = gtk.Socket()
+		rxvt_socket.set_can_focus(True)
+		rxvt_socket.connect_after('realize', self.on_realize)
+		rxvt_socket.connect_after('plug_added', self.on_plug_added)
+		rxvt_socket.connect_after('map_event', self.on_map_event)
 		self.label = label
-		self.rxvt = rxvt
+		self.rxvt_socket = rxvt_socket
 
 	def update_tab_geometry_hints(self):
 		'''
 		copy the WM_NORMAL_HINTS properties of rxvt window to the rxvt tab so it stays within the rxvt resizing requirements
 		resizing might not be smooth anymore if this is called
 		'''
-		rxvt = self.rxvt
-		plugged = rxvt.get_plug_window()
+		rxvt_socket = self.rxvt_socket
+		plugged = rxvt_socket.get_plug_window()
 		prop_type, prop_format, prop_data = plugged.property_get('WM_NORMAL_HINTS', 'WM_SIZE_HINTS')
 		prop_data = ctypes.cast((ctypes.c_uint*len(prop_data))(*prop_data), ctypes.POINTER(XSizeHints)).contents
-		rxvt.get_toplevel().set_geometry_hints(
-			rxvt,
+		rxvt_socket.get_toplevel().set_geometry_hints(
+			rxvt_socket,
 			base_width=prop_data.base_width,
 			base_height=prop_data.base_height,
 			width_inc=prop_data.width_inc,
 			height_inc=prop_data.height_inc
 		)
 
-	def on_realize(self, widget):
+	def on_realize(self, rxvt_socket):
 		'''
 		creates a urxvt instance and embed it in widget
 		'''
-		xid = widget.window.xid
+		xid = rxvt_socket.window.xid
 		subprocess.Popen([self.RXVT_BASENAME, '-embed', str(xid)])
 		return 0
 
-	def on_map_event(self, widget, event):
-		widget.grab_focus()
+	def on_map_event(self, rxvt_socket, event):
+		rxvt_socket.grab_focus()
 		return 0
 
-	def on_plug_added(self, socket):
+	def on_plug_added(self, rxvt_socket):
 		'''
 		runs when the urxvt embedded process attaches a plug to the socket specified by the xid
 			(passed to it as a command-line argument)
 		'''
-		plugged = socket.get_plug_window()
+		plugged = rxvt_socket.get_plug_window()
 		self.update_tab_geometry_hints()
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|gtk.gdk.PROPERTY_CHANGE_MASK)
@@ -139,11 +139,11 @@ class UrxvtTab:
 		#	if event.state == gtk.gdk.PROPERTY_NEW_VALUE:
 		#		if event.atom.name == '_NET_WM_NAME':
 		#			#window name change event
-		#			prop_type, prop_format, prop_data = self.rxvt.get_plug_window().property_get(event.atom.name, 'UTF8_STRING')
+		#			prop_type, prop_format, prop_data = self.rxvt_socket.get_plug_window().property_get(event.atom.name, 'UTF8_STRING')
 		#			self.label.set_text(prop_data)
 
 		self.update_tab_geometry_hints()
-		prop_type, prop_format, prop_data = self.rxvt.get_plug_window().property_get('_NET_WM_NAME', 'UTF8_STRING')
+		prop_type, prop_format, prop_data = self.rxvt_socket.get_plug_window().property_get('_NET_WM_NAME', 'UTF8_STRING')
 		self.label.set_text(prop_data)
 		return gtk.gdk.FILTER_CONTINUE
 
