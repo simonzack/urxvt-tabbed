@@ -5,7 +5,7 @@ import subprocess
 
 import Xlib
 import Xlib.display
-from gi.repository import Gtk, Gdk, GdkX11
+from gi.repository import Gtk, Gdk, GObject, GdkX11
 
 ##
 #gdk helper functions
@@ -44,6 +44,55 @@ class GdkEvents:
 		del self.event_listeners[index]
 
 gdk_events = GdkEvents()
+
+##
+#gtk helper classes
+##
+
+class ClosableTabLabel(Gtk.Box):
+	__gsignals__ = {
+		"close_clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+	}
+
+	def __init__(self, label_text):
+		super().__init__()
+		self.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+		#label
+		label = Gtk.Label(label_text)
+		self.label = label
+		self.pack_start(label, True, True, 0)
+
+		#close button
+		button = Gtk.Button()
+		button.set_relief(Gtk.ReliefStyle.NONE)
+		button.set_focus_on_click(False)
+		button.add(Gtk.Image.new_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU))
+		button.connect('clicked', self.on_click)
+		data =  \
+			'.button {' \
+				'-GtkButton-default-border : 0px;' \
+				'-GtkButton-default-outside-border : 0px;' \
+				'-GtkButton-inner-border: 0px;' \
+				'-GtkWidget-focus-line-width : 0px;' \
+				'-GtkWidget-focus-padding : 0px;' \
+				'padding: 0px;' \
+			'}'
+		provider = Gtk.CssProvider()
+		provider.load_from_data(data.encode())
+		#GTK_STYLE_PROVIDER_PRIORITY_APPLICATION = 600
+		button.get_style_context().add_provider(provider, 600)
+		self.button = button
+		self.pack_start(button, False, False, 0)
+
+		#show all
+		self.show_all()
+
+	def set_text(self, label_text):
+		self.label.set_text(label_text)
+
+	def on_click(self, button, data=None):
+		self.emit("close_clicked")
 
 ##
 #urxvt tabs
@@ -96,7 +145,7 @@ class UrxvtTab:
 	RXVT_BASENAME = 'urxvt'
 
 	def __init__(self, title='urxvt'):
-		label = Gtk.Label(title)
+		label = ClosableTabLabel(title)
 		self.label = label
 		#embedded terminal
 		rxvt_socket = Gtk.Socket()
