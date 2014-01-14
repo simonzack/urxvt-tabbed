@@ -17,11 +17,13 @@ class GdkEvents:
 		https://bugzilla.gnome.org/show_bug.cgi?id=687898
 	'''
 	def __init__(self):
-		self.event_listeners = []
+		#use a dict instead of a list so that id's can be removed properly (list indices can change if a previous event listener is removed)
+		self.event_listeners = {}
 		Gdk.Event.handler_set(self.event_handler, None)
 
 	def event_handler(self, event, data):
-		for func, func_args, func_kwargs in self.event_listeners:
+		#make a copy to avoid errors if the dict changes size
+		for func, func_args, func_kwargs in list(self.event_listeners.values()):
 			func(event, *func_args, **func_kwargs)
 		Gtk.main_do_event(event)
 
@@ -30,15 +32,16 @@ class GdkEvents:
 			func_args = ()
 		if func_kwargs is None:
 			func_kwargs = {}
-		self.event_listeners.append((func, func_args, func_kwargs))
-		return len(self.event_listeners) - 1
+		listener_id = len(self.event_listeners)
+		self.event_listeners[listener_id] = (func, func_args, func_kwargs)
+		return listener_id
 
 	def remove_event_listener(self, index):
 		'''
 		args:
 			index:	functions are not used due to additional introduction of a map structure
 		'''
-		self.event_listeners.pop(index)
+		del self.event_listeners[index]
 
 gdk_events = GdkEvents()
 
