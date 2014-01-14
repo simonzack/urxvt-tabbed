@@ -7,6 +7,44 @@ import Xlib
 import Xlib.display
 from gi.repository import Gtk, Gdk, GdkX11
 
+##
+#gdk helper functions
+##
+
+class GdkEvents:
+	'''
+	event filters are not used due to this bug:
+		https://bugzilla.gnome.org/show_bug.cgi?id=687898
+	'''
+	def __init__(self):
+		self.event_listeners = []
+		Gdk.Event.handler_set(self.event_handler, None)
+
+	def event_handler(self, event, data):
+		for func, func_args, func_kwargs in self.event_listeners:
+			func(event, *func_args, **func_kwargs)
+		Gtk.main_do_event(event)
+
+	def add_event_listener(self, func, func_args=None, func_kwargs=None):
+		if func_args is None:
+			func_args = ()
+		if func_kwargs is None:
+			func_kwargs = {}
+		self.event_listeners.append((func, func_args, func_kwargs))
+		return len(self.event_listeners) - 1
+
+	def remove_event_listener(self, index):
+		'''
+		args:
+			index:	functions are not used due to additional introduction of a map structure
+		'''
+		self.event_listeners.pop(index)
+
+gdk_events = GdkEvents()
+
+##
+#urxvt tabs
+##
 
 class UrxvtTabbedWindow(Gtk.Window):
 	'''
@@ -108,10 +146,10 @@ class UrxvtTab:
 		self.update_tab_geometry_hints()
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
-		Gdk.Event.handler_set(self.on_gdk_event, None)
+		gdk_events.add_event_listener(self.on_gdk_event)
 		return 0
 
-	def on_gdk_event(self, event, data):
+	def on_gdk_event(self, event):
 		'''
 		urxvt only uses x.org, so only gdk events can be used
 
@@ -133,8 +171,6 @@ class UrxvtTab:
 					xlib_window = display.create_resource_object('window', self.rxvt_socket.get_plug_window().get_xid())
 					title = xlib_window.get_wm_name()
 					self.label.set_text(title)
-
-		Gtk.main_do_event(event)
 
 
 def main():
