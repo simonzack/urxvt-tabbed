@@ -109,11 +109,11 @@ class UrxvtTab:
 		'''
 		rxvt_socket = self.rxvt_socket
 		plugged = rxvt_socket.get_plug_window()
-
+		if plugged is None:
+			return
 		display = Xlib.display.Display()
 		xlib_window = display.create_resource_object('window', plugged.get_xid())
 		hints = xlib_window.get_wm_normal_hints()
-
 		geometry = Gdk.Geometry()
 		geometry.base_width = hints.base_width
 		geometry.base_height = hints.base_height
@@ -143,6 +143,8 @@ class UrxvtTab:
 			(passed to it as a command-line argument)
 		'''
 		plugged = rxvt_socket.get_plug_window()
+		if plugged is None:
+			return
 		self.update_tab_geometry_hints()
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
@@ -159,7 +161,11 @@ class UrxvtTab:
 					if event.atom.name() == '_NET_WM_NAME':
 						#window name change event, set tab title
 						display = Xlib.display.Display()
-						xlib_window = display.create_resource_object('window', self.rxvt_socket.get_plug_window().get_xid())
+						plugged = self.rxvt_socket.get_plug_window()
+						if plugged is None:
+							gdk_events.remove_event_listener(self.event_listener_id)
+							return
+						xlib_window = display.create_resource_object('window', plugged.get_xid())
 						title = xlib_window.get_wm_name()
 						self.label.set_text(title)
 		except Xlib.error.BadWindow:
