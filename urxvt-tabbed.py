@@ -78,9 +78,9 @@ class UrxvtTabbedWindow(Gtk.Window):
 		notebook = self.notebook
 		urxvt_tab = UrxvtTab()
 		notebook.append_page(urxvt_tab.rxvt_socket, urxvt_tab.label)
-		notebook.set_current_page(notebook.page_num(urxvt_tab.rxvt_socket))
 		notebook.set_tab_reorderable(urxvt_tab.rxvt_socket, 1)
 		urxvt_tab.rxvt_socket.show_all()
+		notebook.set_current_page(notebook.page_num(urxvt_tab.rxvt_socket))
 
 	def on_new_tab_click(self, widget):
 		urxvt_tab = UrxvtTab()
