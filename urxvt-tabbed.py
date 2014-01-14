@@ -83,7 +83,6 @@ class UrxvtTabbedWindow(Gtk.Window):
 		notebook.set_current_page(notebook.page_num(urxvt_tab.rxvt_socket))
 
 	def on_new_tab_click(self, widget):
-		urxvt_tab = UrxvtTab()
 		self.add_new_terminal()
 		return 0
 
@@ -93,13 +92,13 @@ class UrxvtTab:
 
 	def __init__(self, title='urxvt'):
 		label = Gtk.Label(title)
+		self.label = label
 		#embedded terminal
 		rxvt_socket = Gtk.Socket()
 		rxvt_socket.set_can_focus(True)
 		rxvt_socket.connect_after('realize', self.on_realize)
 		rxvt_socket.connect_after('plug_added', self.on_plug_added)
 		rxvt_socket.connect_after('map_event', self.on_map_event)
-		self.label = label
 		self.rxvt_socket = rxvt_socket
 		self.event_listener_id = None
 
