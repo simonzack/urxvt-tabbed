@@ -146,21 +146,11 @@ class UrxvtTab:
 		self.update_tab_geometry_hints()
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
+		#urxvt only uses x.org, so only gdk events can be used
 		gdk_events.add_event_listener(self.on_gdk_event)
 		return 0
 
 	def on_gdk_event(self, event):
-		'''
-		urxvt only uses x.org, so only gdk events can be used
-
-		pygtk:
-			due to a bug only gtk.gdk.NOTHING is returned, so try to update the window regardless of the event:
-				https://bugzilla.gnome.org/show_bug.cgi?id=722027
-
-		pygobject:
-			event filters are not used due to this bug:
-				https://bugzilla.gnome.org/show_bug.cgi?id=687898
-		'''
 		if event.type == Gdk.EventType.CONFIGURE:
 			self.update_tab_geometry_hints()
 		elif event.type == Gdk.EventType.PROPERTY_NOTIFY:
