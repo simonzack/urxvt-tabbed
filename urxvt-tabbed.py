@@ -2,6 +2,7 @@
 
 import ctypes
 import subprocess
+import signal
 
 import Xlib
 import Xlib.display
@@ -146,6 +147,7 @@ class UrxvtTab:
 
 	def __init__(self, title='urxvt'):
 		label = ClosableTabLabel(title)
+		label.connect('close_clicked', lambda *args, **kwargs: self.on_new_tab_close_click(*args, **kwargs))
 		self.label = label
 		#embedded terminal
 		rxvt_socket = Gtk.Socket()
@@ -157,6 +159,7 @@ class UrxvtTab:
 		rxvt_socket.connect_after('map_event', lambda *args, **kwargs: self.on_map_event(*args, **kwargs))
 		self.event_listener_id = None
 		self.plugged = None
+		self.terminal_process = None
 
 	def update_tab_geometry_hints(self):
 		'''
@@ -182,7 +185,7 @@ class UrxvtTab:
 		creates a urxvt instance and embed it in widget
 		'''
 		xid = rxvt_socket.get_window().get_xid()
-		subprocess.Popen([self.RXVT_BASENAME, '-embed', str(xid)])
+		self.terminal_process = subprocess.Popen([self.RXVT_BASENAME, '-embed', str(xid)])
 		return 0
 
 	def on_map_event(self, rxvt_socket, event):
@@ -220,6 +223,10 @@ class UrxvtTab:
 		except Xlib.error.BadWindow:
 			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
+
+	def on_new_tab_close_click(self, widget):
+		self.terminal_process.send_signal(signal.SIGINT)
+		return 0
 
 
 def main():
