@@ -101,6 +101,7 @@ class UrxvtTab:
 		rxvt_socket.connect_after('map_event', self.on_map_event)
 		self.label = label
 		self.rxvt_socket = rxvt_socket
+		self.event_listener_id = None
 
 	def update_tab_geometry_hints(self):
 		'''
@@ -147,20 +148,24 @@ class UrxvtTab:
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
 		#urxvt only uses x.org, so only gdk events can be used
-		gdk_events.add_event_listener(self.on_gdk_event)
+		self.event_listener_id = gdk_events.add_event_listener(self.on_gdk_event)
 		return 0
 
 	def on_gdk_event(self, event):
-		if event.type == Gdk.EventType.CONFIGURE:
-			self.update_tab_geometry_hints()
-		elif event.type == Gdk.EventType.PROPERTY_NOTIFY:
-			if event.state == Gdk.PropertyState.NEW_VALUE:
-				if event.atom.name() == '_NET_WM_NAME':
-					#window name change event, set tab title
-					display = Xlib.display.Display()
-					xlib_window = display.create_resource_object('window', self.rxvt_socket.get_plug_window().get_xid())
-					title = xlib_window.get_wm_name()
-					self.label.set_text(title)
+		try:
+			if event.type == Gdk.EventType.CONFIGURE:
+				self.update_tab_geometry_hints()
+			elif event.type == Gdk.EventType.PROPERTY_NOTIFY:
+				if event.state == Gdk.PropertyState.NEW_VALUE:
+					if event.atom.name() == '_NET_WM_NAME':
+						#window name change event, set tab title
+						display = Xlib.display.Display()
+						xlib_window = display.create_resource_object('window', self.rxvt_socket.get_plug_window().get_xid())
+						title = xlib_window.get_wm_name()
+						self.label.set_text(title)
+		except Xlib.error.BadWindow:
+			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
+			gdk_events.remove_event_listener(self.event_listener_id)
 
 
 def main():
