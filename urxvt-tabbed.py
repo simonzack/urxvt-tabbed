@@ -98,11 +98,12 @@ class UrxvtTab:
 		self.label = label
 		#embedded terminal
 		rxvt_socket = Gtk.Socket()
-		rxvt_socket.set_can_focus(True)
-		rxvt_socket.connect_after('realize', self.on_realize)
-		rxvt_socket.connect_after('plug_added', self.on_plug_added)
-		rxvt_socket.connect_after('map_event', self.on_map_event)
 		self.rxvt_socket = rxvt_socket
+		rxvt_socket.set_can_focus(True)
+		#pygobject has some strange bug where if self is directory used then self fields won't exist
+		rxvt_socket.connect_after('realize', lambda *args, **kwargs: self.on_realize(*args, **kwargs))
+		rxvt_socket.connect_after('plug_added', lambda *args, **kwargs: self.on_plug_added(*args, **kwargs))
+		rxvt_socket.connect_after('map_event', lambda *args, **kwargs: self.on_map_event(*args, **kwargs))
 		self.event_listener_id = None
 		self.plugged = None
 
