@@ -101,6 +101,7 @@ class UrxvtTab:
 		rxvt_socket.connect_after('map_event', self.on_map_event)
 		self.rxvt_socket = rxvt_socket
 		self.event_listener_id = None
+		self.plugged = None
 
 	def update_tab_geometry_hints(self):
 		'''
@@ -108,11 +109,8 @@ class UrxvtTab:
 		resizing might not be smooth anymore if this is called
 		'''
 		rxvt_socket = self.rxvt_socket
-		plugged = rxvt_socket.get_plug_window()
-		if plugged is None:
-			return
 		display = Xlib.display.Display()
-		xlib_window = display.create_resource_object('window', plugged.get_xid())
+		xlib_window = display.create_resource_object('window', self.plugged.get_xid())
 		hints = xlib_window.get_wm_normal_hints()
 		geometry = Gdk.Geometry()
 		geometry.base_width = hints.base_width
@@ -122,7 +120,6 @@ class UrxvtTab:
 		geom_mask = Gdk.WindowHints(0)
 		geom_mask |= Gdk.WindowHints.BASE_SIZE
 		geom_mask |= Gdk.WindowHints.RESIZE_INC
-
 		rxvt_socket.get_toplevel().set_geometry_hints(rxvt_socket, geometry, geom_mask)
 
 	def on_realize(self, rxvt_socket):
@@ -145,6 +142,7 @@ class UrxvtTab:
 		plugged = rxvt_socket.get_plug_window()
 		if plugged is None:
 			return
+		self.plugged = plugged
 		self.update_tab_geometry_hints()
 		#listen to gdk property change events
 		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
@@ -161,11 +159,7 @@ class UrxvtTab:
 					if event.atom.name() == '_NET_WM_NAME':
 						#window name change event, set tab title
 						display = Xlib.display.Display()
-						plugged = self.rxvt_socket.get_plug_window()
-						if plugged is None:
-							gdk_events.remove_event_listener(self.event_listener_id)
-							return
-						xlib_window = display.create_resource_object('window', plugged.get_xid())
+						xlib_window = display.create_resource_object('window', self.plugged.get_xid())
 						title = xlib_window.get_wm_name()
 						self.label.set_text(title)
 		except Xlib.error.BadWindow:
