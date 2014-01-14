@@ -69,9 +69,11 @@ class UrxvtTabbedWindow(Gtk.Window):
 		self.notebook = notebook
 
 		#new tab button
-		new_tab_button = Gtk.Button('+')
+		new_tab_button = Gtk.Button()
+		new_tab_button.set_relief(Gtk.ReliefStyle.NONE)
+		new_tab_button.add(Gtk.Image.new_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU))
 		new_tab_button.connect('clicked', self.on_new_tab_click)
-		new_tab_button.show()
+		new_tab_button.show_all()
 		notebook.set_action_widget(new_tab_button, Gtk.PackType.END)
 
 		#add new tab (otherwise the notebook won't appear)
