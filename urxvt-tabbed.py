@@ -139,7 +139,6 @@ class UrxvtTabbedWindow(Gtk.Window):
 
 	def on_new_tab_click(self, widget):
 		self.add_new_terminal()
-		return 0
 
 
 class UrxvtTab:
@@ -186,11 +185,11 @@ class UrxvtTab:
 		'''
 		xid = rxvt_socket.get_window().get_xid()
 		self.terminal_process = subprocess.Popen([self.RXVT_BASENAME, '-embed', str(xid)])
-		return 0
+		return False
 
 	def on_map_event(self, rxvt_socket, event):
 		rxvt_socket.grab_focus()
-		return 0
+		return False
 
 	def on_plug_added(self, rxvt_socket):
 		'''
@@ -206,7 +205,7 @@ class UrxvtTab:
 		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
 		#urxvt only uses x.org, so only gdk events can be used
 		self.event_listener_id = gdk_events.add_event_listener(self.on_gdk_event)
-		return 0
+		return False
 
 	def on_gdk_event(self, event):
 		try:
@@ -224,9 +223,11 @@ class UrxvtTab:
 			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
 
-	def on_new_tab_close_click(self, widget):
+	def close(self):
 		self.terminal_process.send_signal(signal.SIGINT)
-		return 0
+
+	def on_new_tab_close_click(self, widget):
+		self.close()
 
 
 def main():
