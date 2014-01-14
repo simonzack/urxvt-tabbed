@@ -208,6 +208,10 @@ class UrxvtTab:
 		return False
 
 	def on_gdk_event(self, event):
+		'''
+		events are also created when the urxvt plugged window closes,
+			this handler disconnects itself when it recieves the event
+		'''
 		try:
 			if event.type == Gdk.EventType.CONFIGURE:
 				self.update_tab_geometry_hints()
