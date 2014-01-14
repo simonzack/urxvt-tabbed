@@ -1,60 +1,37 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
-import gtk
 import ctypes
 import subprocess
 
-CARD32 = ctypes.c_uint32
-
-class XSizeHints(ctypes.Structure):
-	class Point(ctypes.Structure):
-		_fields_ = [
-			('x', ctypes.c_int),
-			('y', ctypes.c_int),
-		]
-
-	_fields_ = [
-		('flags', CARD32),
-		('pad', CARD32*4),
-		('min_width', ctypes.c_int),
-		('min_height', ctypes.c_int),
-		('max_width', ctypes.c_int),
-		('max_height', ctypes.c_int),
-		('width_inc', ctypes.c_int),
-		('height_inc', ctypes.c_int),
-		('min_aspect', Point),
-		('max_aspect', Point),
-		('base_width', ctypes.c_int),
-		('base_height', ctypes.c_int),
-		('win_gravity', ctypes.c_int),
-	]
+import Xlib
+import Xlib.display
+from gi.repository import Gtk, Gdk, GdkX11
 
 
-class UrxvtTabbedWindow:
+class UrxvtTabbedWindow(Gtk.Window):
 	'''
 	Wrapper around urxvt which adds tabs
 	the Gtk2::URxvt perl module doesn't seem to be available yet
 	'''
 
 	def __init__(self):
-		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window = window
+		super().__init__(title='urxvt')
 
-		vbox = gtk.VBox()
-		window.add(vbox)
+		vbox = Gtk.VBox()
+		self.add(vbox)
 
 		#tabs container
-		notebook = gtk.Notebook()
+		notebook = Gtk.Notebook()
 		notebook.set_can_focus(False)
 		notebook.set_scrollable(True)
-		vbox.pack_start(notebook)
+		vbox.pack_start(notebook, True, True, 0)
 		self.notebook = notebook
 
 		#new tab button
-		new_tab_button = gtk.Button('+')
+		new_tab_button = Gtk.Button('+')
 		new_tab_button.connect('clicked', self.on_new_tab_click)
 		new_tab_button.show()
-		notebook.set_action_widget(new_tab_button, 'end')
+		notebook.set_action_widget(new_tab_button, Gtk.PackType.END)
 
 		#add new tab (otherwise the notebook won't appear)
 		self.add_new_terminal()
@@ -77,9 +54,9 @@ class UrxvtTab:
 	RXVT_BASENAME = 'urxvt'
 
 	def __init__(self, title='urxvt'):
-		label = gtk.Label(title)
+		label = Gtk.Label(title)
 		#embedded terminal
-		rxvt_socket = gtk.Socket()
+		rxvt_socket = Gtk.Socket()
 		rxvt_socket.set_can_focus(True)
 		rxvt_socket.connect_after('realize', self.on_realize)
 		rxvt_socket.connect_after('plug_added', self.on_plug_added)
@@ -94,21 +71,27 @@ class UrxvtTab:
 		'''
 		rxvt_socket = self.rxvt_socket
 		plugged = rxvt_socket.get_plug_window()
-		prop_type, prop_format, prop_data = plugged.property_get('WM_NORMAL_HINTS', 'WM_SIZE_HINTS')
-		prop_data = ctypes.cast((ctypes.c_uint*len(prop_data))(*prop_data), ctypes.POINTER(XSizeHints)).contents
-		rxvt_socket.get_toplevel().set_geometry_hints(
-			rxvt_socket,
-			base_width=prop_data.base_width,
-			base_height=prop_data.base_height,
-			width_inc=prop_data.width_inc,
-			height_inc=prop_data.height_inc
-		)
+
+		display = Xlib.display.Display()
+		xlib_window = display.create_resource_object('window', plugged.get_xid())
+		hints = xlib_window.get_wm_normal_hints()
+
+		geometry = Gdk.Geometry()
+		geometry.base_width = hints.base_width
+		geometry.base_height = hints.base_height
+		geometry.width_inc = hints.width_inc
+		geometry.height_inc = hints.height_inc
+		geom_mask = Gdk.WindowHints(0)
+		geom_mask |= Gdk.WindowHints.BASE_SIZE
+		geom_mask |= Gdk.WindowHints.RESIZE_INC
+
+		rxvt_socket.get_toplevel().set_geometry_hints(rxvt_socket, geometry, geom_mask)
 
 	def on_realize(self, rxvt_socket):
 		'''
 		creates a urxvt instance and embed it in widget
 		'''
-		xid = rxvt_socket.window.xid
+		xid = rxvt_socket.get_window().get_xid()
 		subprocess.Popen([self.RXVT_BASENAME, '-embed', str(xid)])
 		return 0
 
@@ -124,34 +107,42 @@ class UrxvtTab:
 		plugged = rxvt_socket.get_plug_window()
 		self.update_tab_geometry_hints()
 		#listen to gdk property change events
-		plugged.set_events(plugged.get_events()|gtk.gdk.PROPERTY_CHANGE_MASK)
-		#add gdk event filters (urxvt only uses x.org, so only gdk can be used)
-		plugged.add_filter(self.on_gdk_property_notify)
+		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
+		Gdk.Event.handler_set(self.on_gdk_event, None)
 		return 0
 
-	def on_gdk_property_notify(self, event):
-		#due to a bug in pygtk only gtk.gdk.NOTHING is returned, so try to update the window regardless of the event
-		#	https://bugzilla.gnome.org/show_bug.cgi?id=722027
+	def on_gdk_event(self, event, data):
+		'''
+		urxvt only uses x.org, so only gdk events can be used
 
-		#if event.type == gtk.gdk.CONFIGURE:
-		#	self.update_tab_geometry_hints()
-		#elif event.type == gtk.gdk.PROPERTY_NOTIFY:
-		#	if event.state == gtk.gdk.PROPERTY_NEW_VALUE:
-		#		if event.atom.name == '_NET_WM_NAME':
-		#			#window name change event
-		#			prop_type, prop_format, prop_data = self.rxvt_socket.get_plug_window().property_get(event.atom.name, 'UTF8_STRING')
-		#			self.label.set_text(prop_data)
+		pygtk:
+			due to a bug only gtk.gdk.NOTHING is returned, so try to update the window regardless of the event:
+				https://bugzilla.gnome.org/show_bug.cgi?id=722027
 
-		self.update_tab_geometry_hints()
-		prop_type, prop_format, prop_data = self.rxvt_socket.get_plug_window().property_get('_NET_WM_NAME', 'UTF8_STRING')
-		self.label.set_text(prop_data)
-		return gtk.gdk.FILTER_CONTINUE
+		pygobject:
+			event filters are not used due to this bug:
+				https://bugzilla.gnome.org/show_bug.cgi?id=687898
+		'''
+		if event.type == Gdk.EventType.CONFIGURE:
+			self.update_tab_geometry_hints()
+		elif event.type == Gdk.EventType.PROPERTY_NOTIFY:
+			if event.state == Gdk.PropertyState.NEW_VALUE:
+				if event.atom.name() == '_NET_WM_NAME':
+					#window name change event, set tab title
+					display = Xlib.display.Display()
+					xlib_window = display.create_resource_object('window', self.rxvt_socket.get_plug_window().get_xid())
+					title = xlib_window.get_wm_name()
+					self.label.set_text(title)
+
+		Gtk.main_do_event(event)
+
 
 def main():
 	tabbed_window = UrxvtTabbedWindow()
-	tabbed_window.window.maximize()
-	tabbed_window.window.show_all()
-	gtk.mainloop()
+	tabbed_window.maximize()
+	tabbed_window.show_all()
+	tabbed_window.connect('destroy', Gtk.main_quit)
+	Gtk.main()
 
 if __name__=='__main__':
 	main()
