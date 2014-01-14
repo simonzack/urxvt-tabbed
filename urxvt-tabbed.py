@@ -228,6 +228,7 @@ class UrxvtTab:
 			gdk_events.remove_event_listener(self.event_listener_id)
 
 	def close(self):
+		#this detaches the gdk event listener as well, see docs for on_gdk_event()
 		self.terminal_process.send_signal(signal.SIGINT)
 
 	def on_new_tab_close_click(self, widget):
