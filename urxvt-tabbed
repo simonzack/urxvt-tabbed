@@ -113,6 +113,8 @@ class ClosableTabLabel(Gtk.Box):
 		label_text = self.label.get_text()
 		self.label_entry.set_width_chars(len(label_text))
 		self.label_entry.set_text(label_text)
+		#select all text
+		self.label_entry.emit('move-cursor', 1, len(label_text), True)
 
 	def label_edit_end(self):
 		self.emit('label_edit_end')
