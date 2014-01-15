@@ -1,6 +1,8 @@
 # URxvt Tabbed
 
 URxvt terminals with gtk 3 tabs.
+Tabs are implemented by embedding URxvt in a gtk notebook container, using pygobject as an interface to gtk.
+URxvt does provide a rudimentary default gtk tabs implementation using perl, but with few features (e.g. no tab dragging or tab closing).
 
 ##Features
 
