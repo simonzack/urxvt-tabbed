@@ -293,6 +293,19 @@ class UrxvtTab:
 		self.event_listener_id = gdk_events.add_event_listener(self.on_gdk_event)
 		return False
 
+	def shell_set_title(self, title):
+		if not self.has_custom_title:
+			self.label.set_text(title)
+
+	def user_set_title(self, title):
+		#only use the user specified label if it isn't empty
+		if title:
+			self.has_custom_title = True
+			self.label.set_text(title)
+		else:
+			self.has_custom_title = False
+			self.label.set_text(self.shell_title)
+
 	def on_gdk_event(self, event):
 		'''
 		events are also created when the urxvt plugged window closes,
@@ -309,21 +322,13 @@ class UrxvtTab:
 						xlib_window = display.create_resource_object('window', self.plugged.get_xid())
 						title = xlib_window.get_wm_name()
 						self.shell_title = title
-						if not self.has_custom_title:
-							self.label.set_text(title)
+						self.shell_set_title(title)
 		except Xlib.error.BadWindow:
 			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
 
 	def on_label_edit_end(self, label):
-		title = self.label.get_text()
-		#only use the user specified label if it isn't empty
-		if title:
-			self.has_custom_title = True
-			self.label.set_text(title)
-		else:
-			self.has_custom_title = False
-			self.label.set_text(self.shell_title)
+		self.user_set_title(self.label.get_text())
 
 	def close(self):
 		#this detaches the gdk event listener as well, see docs for on_gdk_event()
