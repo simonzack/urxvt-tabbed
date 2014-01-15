@@ -12,9 +12,21 @@ URxvt does provide a rudimentary default gtk tabs implementation using perl, but
 
 ## Installation and Use
 
-On arch:
+This project depends on `python-gobject` and `python3-xlib`.
+
+### Dependencies
+
+On Arch Linux:
+
 - `sudo pacman -S python-gobject`
 - `sudo yaourt -S python3-xlib`
+
+On other Linux systems:
+
+- Install `python-gobject` using your favorite package manager
+- `pip3 install python3-xlib`
+
+### URxvt Tabbed
 - `git clone git@github.com:simonzack/urxvt-tabbed.git`
 - `cd urxvt-tabbed`
 - `./urxvt-tabbed`
