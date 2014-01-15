@@ -99,6 +99,9 @@ class ClosableTabLabel(Gtk.Box):
 		self.show_all()
 		self.label_entry.hide()
 
+	def get_text(self):
+		return self.label.get_text()
+
 	def set_text(self, label_text):
 		self.label.set_text(label_text)
 
@@ -106,7 +109,6 @@ class ClosableTabLabel(Gtk.Box):
 		self.emit('close_clicked')
 
 	def label_edit_start(self):
-		self.emit('label_edit_start')
 		self.label.hide()
 		self.label_entry.show()
 		self.label_entry.grab_focus()
@@ -115,13 +117,14 @@ class ClosableTabLabel(Gtk.Box):
 		self.label_entry.set_text(label_text)
 		#select all text
 		self.label_entry.emit('move-cursor', 1, len(label_text), True)
+		self.emit('label_edit_start')
 
 	def label_edit_end(self):
-		self.emit('label_edit_end')
 		self.label_entry.hide()
 		self.label.show()
 		label_text = self.label_entry.get_text()
 		self.label.set_text(label_text)
+		self.emit('label_edit_end')
 
 	def on_label_button_press(self, event_box, event, data=None):
 		'''
@@ -225,7 +228,8 @@ class UrxvtTab:
 
 	def __init__(self, title='urxvt'):
 		label = ClosableTabLabel(title)
-		label.connect('close_clicked', lambda *args, **kwargs: self.on_new_tab_close_click(*args, **kwargs))
+		label.connect('close_clicked', self.on_new_tab_close_click)
+		label.connect('label_edit_end', self.on_label_edit_end)
 		self.label = label
 		#embedded terminal
 		rxvt_socket = Gtk.Socket()
@@ -238,6 +242,9 @@ class UrxvtTab:
 		self.event_listener_id = None
 		self.plugged = None
 		self.terminal_process = None
+		#tab labels
+		self.shell_title = title
+		self.has_custom_title = False
 
 	def update_tab_geometry_hints(self):
 		'''
@@ -301,10 +308,22 @@ class UrxvtTab:
 						display = Xlib.display.Display()
 						xlib_window = display.create_resource_object('window', self.plugged.get_xid())
 						title = xlib_window.get_wm_name()
-						self.label.set_text(title)
+						self.shell_title = title
+						if not self.has_custom_title:
+							self.label.set_text(title)
 		except Xlib.error.BadWindow:
 			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
+
+	def on_label_edit_end(self, label):
+		title = self.label.get_text()
+		#only use the user specified label if it isn't empty
+		if title:
+			self.has_custom_title = True
+			self.label.set_text(title)
+		else:
+			self.has_custom_title = False
+			self.label.set_text(self.shell_title)
 
 	def close(self):
 		#this detaches the gdk event listener as well, see docs for on_gdk_event()
