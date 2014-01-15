@@ -19,7 +19,7 @@ On arch:
 
 ## Screenshots
 
-![Multiple tabs](https://github.com/simonzack/urxvt-tabbed/screenshots/screenshot.png)
+![Multiple tabs](https://raw2.github.com/simonzack/urxvt-tabbed/master/screenshots/screenshot.png)
 
 ## Contributing
 
