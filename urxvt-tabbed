@@ -305,6 +305,7 @@ class UrxvtTab:
 		else:
 			self.has_custom_title = False
 			self.label.set_text(self.shell_title)
+		self.rxvt_socket.grab_focus()
 
 	def on_gdk_event(self, event):
 		'''
