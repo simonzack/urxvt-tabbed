@@ -124,6 +124,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 		new_tab_button.connect('clicked', self.on_new_tab_click)
 		new_tab_button.show_all()
 		notebook.set_action_widget(new_tab_button, Gtk.PackType.END)
+		self.connect('delete_event', self.on_delete_event)
 
 		#add new tab (otherwise the notebook won't appear)
 		self.add_new_terminal()
@@ -138,6 +139,28 @@ class UrxvtTabbedWindow(Gtk.Window):
 
 	def on_new_tab_click(self, widget):
 		self.add_new_terminal()
+
+	def on_delete_event(self, widget, data):
+		children = self.notebook.get_children()
+		num_tabs = len(children)
+		if num_tabs <= 1:
+			#close window if there's only a single tab
+			Gtk.main_quit()
+		else:
+			#ask the user to close all tabs or not
+			dialog = Gtk.MessageDialog(
+				flags=Gtk.DialogFlags.MODAL,
+				type=Gtk.MessageType.QUESTION,
+				message_format='You are about to close {} tabs. Are you sure you want to continue?'.format(num_tabs)
+			)
+			dialog.add_button('Close window', Gtk.ResponseType.OK)
+			dialog.add_button('Cancel', Gtk.ResponseType.CANCEL)
+			response_code = dialog.run()
+			if response_code == Gtk.ResponseType.OK:
+				Gtk.main_quit()
+			else:
+				dialog.destroy()
+				return True
 
 
 class UrxvtTab:
@@ -238,7 +261,6 @@ def main():
 	tabbed_window = UrxvtTabbedWindow()
 	tabbed_window.maximize()
 	tabbed_window.show_all()
-	tabbed_window.connect('destroy', Gtk.main_quit)
 	Gtk.main()
 
 if __name__=='__main__':
