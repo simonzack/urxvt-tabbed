@@ -189,6 +189,11 @@ class UrxvtTabbedWindow(Gtk.Window):
 		#add new tab (otherwise the notebook won't appear)
 		self.add_new_terminal()
 
+		#set window icon
+		icon_info = Gtk.IconTheme().lookup_icon('terminal', 48, 0)
+		if icon_info:
+			self.set_icon(icon_info.load_icon())
+
 	def add_new_terminal(self):
 		notebook = self.notebook
 		urxvt_tab = UrxvtTab()
