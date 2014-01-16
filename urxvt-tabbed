@@ -1,7 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import subprocess
 import signal
+import configparser
+import os
 
 import Xlib
 import Xlib.display
@@ -345,6 +347,8 @@ class UrxvtTab:
 
 
 def main():
+	config = configparser.ConfigParser()
+	config.read(os.path.expanduser('~/.urxvt_tabbed/urxvt_tabbed.conf'))
 	tabbed_window = UrxvtTabbedWindow()
 	tabbed_window.maximize()
 	tabbed_window.show_all()
