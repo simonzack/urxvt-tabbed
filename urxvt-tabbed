@@ -246,6 +246,7 @@ class UrxvtTab:
 		label = ClosableTabLabel(title)
 		label.connect('close_clicked', self.on_new_tab_close_click)
 		label.connect('label_edit_submit', self.on_label_edit_submit)
+		label.connect('label_edit_blur', self.on_label_edit_blur)
 		self.label = label
 		#embedded terminal
 		rxvt_socket = Gtk.Socket()
@@ -321,7 +322,6 @@ class UrxvtTab:
 		else:
 			self.has_custom_title = False
 			self.label.set_text(self.shell_title)
-		self.rxvt_socket.grab_focus()
 
 	def on_gdk_event(self, event):
 		'''
@@ -343,6 +343,9 @@ class UrxvtTab:
 		except Xlib.error.BadWindow:
 			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
+
+	def on_label_edit_blur(self, label):
+		self.rxvt_socket.grab_focus()
 
 	def on_label_edit_submit(self, label):
 		self.user_set_title(self.label.get_text())
