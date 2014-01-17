@@ -8,6 +8,7 @@ import os
 import Xlib
 import Xlib.display
 from gi.repository import Gtk, Gdk, GObject, GdkX11
+from gi.overrides import keysyms
 
 ##
 #gdk helper functions
@@ -144,9 +145,12 @@ class ClosableTabLabel(Gtk.Box):
 		'''
 		restore label after enter is pressed
 		'''
-		if event.keyval==0xFF0D:
+		if event.keyval==keysyms.Return:
 			#enter key press
 			self.label_edit_submit()
+		elif event.keyval==keysyms.Escape:
+			#enter key press
+			self.label_edit_blur()
 
 	def on_label_entry_focus_out(self, label_entry, event, data=None):
 		'''
