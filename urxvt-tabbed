@@ -152,7 +152,7 @@ class ClosableTabLabel(Gtk.Box):
 		'''
 		restore label after focus out
 		'''
-		self.label_edit_submit()
+		self.label_edit_blur()
 
 	def on_label_entry_changed(self, label_entry, data=None):
 		'''
