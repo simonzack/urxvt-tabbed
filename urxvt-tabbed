@@ -54,8 +54,9 @@ gdk_events = GdkEvents()
 class ClosableTabLabel(Gtk.Box):
 	__gsignals__ = {
 		"close_clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
-		"label_edit_start": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
-		"label_edit_end": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+		"label_edit_focus": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+		"label_edit_blur": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+		"label_edit_submit": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
 	}
 
 	def __init__(self, label_text):
@@ -110,7 +111,7 @@ class ClosableTabLabel(Gtk.Box):
 	def on_close_click(self, button, data=None):
 		self.emit('close_clicked')
 
-	def label_edit_start(self):
+	def label_edit_focus(self):
 		self.label.hide()
 		self.label_entry.show()
 		self.label_entry.grab_focus()
@@ -119,21 +120,25 @@ class ClosableTabLabel(Gtk.Box):
 		self.label_entry.set_text(label_text)
 		#select all text
 		self.label_entry.emit('move-cursor', 1, len(label_text), True)
-		self.emit('label_edit_start')
+		self.emit('label_edit_focus')
 
-	def label_edit_end(self):
-		self.label_entry.hide()
-		self.label.show()
+	def label_edit_submit(self):
 		label_text = self.label_entry.get_text()
 		self.label.set_text(label_text)
-		self.emit('label_edit_end')
+		self.emit('label_edit_submit')
+		self.label_edit_blur()
+
+	def label_edit_blur(self):
+		self.label_entry.hide()
+		self.label.show()
+		self.emit('label_edit_blur')
 
 	def on_label_button_press(self, event_box, event, data=None):
 		'''
 		edit label on double click
 		'''
 		if event.type==Gdk.EventType._2BUTTON_PRESS:
-			self.label_edit_start()
+			self.label_edit_focus()
 
 	def on_label_entry_key_press(self, label_entry, event, data=None):
 		'''
@@ -141,13 +146,13 @@ class ClosableTabLabel(Gtk.Box):
 		'''
 		if event.keyval==0xFF0D:
 			#enter key press
-			self.label_edit_end()
+			self.label_edit_submit()
 
 	def on_label_entry_focus_out(self, label_entry, event, data=None):
 		'''
 		restore label after focus out
 		'''
-		self.label_edit_end()
+		self.label_edit_submit()
 
 	def on_label_entry_changed(self, label_entry, data=None):
 		'''
@@ -236,7 +241,7 @@ class UrxvtTab:
 	def __init__(self, title='urxvt'):
 		label = ClosableTabLabel(title)
 		label.connect('close_clicked', self.on_new_tab_close_click)
-		label.connect('label_edit_end', self.on_label_edit_end)
+		label.connect('label_edit_submit', self.on_label_edit_submit)
 		self.label = label
 		#embedded terminal
 		rxvt_socket = Gtk.Socket()
@@ -335,7 +340,7 @@ class UrxvtTab:
 			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
 
-	def on_label_edit_end(self, label):
+	def on_label_edit_submit(self, label):
 		self.user_set_title(self.label.get_text())
 
 	def close(self):
