@@ -343,6 +343,7 @@ class UrxvtTab:
 		except Xlib.error.BadWindow:
 			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
+			self.close()
 
 	def on_label_edit_blur(self, label):
 		self.rxvt_socket.grab_focus()
