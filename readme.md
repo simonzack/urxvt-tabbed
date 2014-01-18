@@ -9,6 +9,7 @@ URxvt does provide a rudimentary default gtk tabs implementation using perl, but
 - Tab name editing (double click).
 - Tab closing, drag & drop.
 - Inherits tab titles set by shells.
+- Customizable tab keyboard shortcuts.
 
 ## Installation and Use
 
