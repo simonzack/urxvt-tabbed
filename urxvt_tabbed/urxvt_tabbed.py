@@ -11,6 +11,9 @@ from .config import KeyPress
 
 gdk_events = GdkEvents()
 
+def is_key_pressed(key, event_key):
+	return event_key.key == key.key and event_key.modifier_flags&key.modifier_flags == key.modifier_flags
+
 class UrxvtTabbedWindow(Gtk.Window):
 	'''
 	Wrapper around urxvt which adds tabs
@@ -94,15 +97,15 @@ class UrxvtTabbedWindow(Gtk.Window):
 
 	def on_key_press(self, label_entry, event):
 		keymap = self.config['keymap']
-		keypress = KeyPress(event.state, event.keyval)
-		if keypress == keymap['new_tab']:
+		event_key = KeyPress(event.state, event.keyval)
+		if is_key_pressed(keymap['new_tab'], event_key):
 			self.add_terminal()
-		elif keypress == keymap['close_tab']:
+		elif is_key_pressed(keymap['close_tab'], event_key):
 			self.close_terminal(self.notebook.get_current_page())
-		elif keypress == keymap['prev_tab']:
+		elif is_key_pressed(keymap['prev_tab'], event_key):
 			#prev_page() doens't switch to the last tab on the first tab
 			self.notebook.set_current_page((self.notebook.get_current_page()-1)%len(self.tabs))
-		elif keypress == keymap['next_tab']:
+		elif is_key_pressed(keymap['next_tab'], event_key):
 			self.notebook.set_current_page((self.notebook.get_current_page()+1)%len(self.tabs))
 
 	def on_page_removed(self, notebook, tab, page_num):
@@ -236,7 +239,7 @@ class UrxvtTab:
 			self.terminal_process.send_signal(signal.SIGINT)
 			#call wait() so there's no defunct process
 			self.terminal_process.wait()
-		except ProcessLookupError:
+		except OSError:
 			pass
 
 	def on_new_tab_close_click(self, widget):
