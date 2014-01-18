@@ -29,8 +29,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 		notebook.set_scrollable(True)
 		vbox.pack_start(notebook, True, True, 0)
 		self.notebook = notebook
-
-		#tabs
+		self.notebook.connect('page-removed', self.on_page_removed)
 		self.tabs = []
 
 		#new tab button
@@ -67,7 +66,6 @@ class UrxvtTabbedWindow(Gtk.Window):
 
 	def close_terminal(self, i):
 		self.tabs[i].close()
-		self.tabs.pop(i)
 
 	def on_new_tab_click(self, widget):
 		self.add_terminal()
@@ -94,7 +92,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 				dialog.destroy()
 				return True
 
-	def on_key_press(self, label_entry, event, data=None):
+	def on_key_press(self, label_entry, event):
 		keymap = self.config['keymap']
 		keypress = KeyPress(event.state, event.keyval)
 		if keypress == keymap['new_tab']:
@@ -106,6 +104,18 @@ class UrxvtTabbedWindow(Gtk.Window):
 			self.notebook.set_current_page((self.notebook.get_current_page()-1)%len(self.tabs))
 		elif keypress == keymap['next_tab']:
 			self.notebook.set_current_page((self.notebook.get_current_page()+1)%len(self.tabs))
+
+	def on_page_removed(self, notebook, tab, page_num):
+		self.tabs.pop(page_num)
+		#check if there are any more terminals left
+		if not self.tabs:
+			config_close_last_tab = self.config['general']['close_last_tab']
+			if config_close_last_tab == 'blank':
+				pass
+			elif config_close_last_tab == 'new':
+				self.add_terminal()
+			elif config_close_last_tab == 'close':
+				self.close()
 
 
 class UrxvtTab:

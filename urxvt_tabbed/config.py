@@ -99,7 +99,7 @@ class ConfigDefaults(Config):
 	def defaults(cls):
 		config = {
 			'general': {
-				'close_last_tab': 'blank',
+				'close_last_tab': 'new',
 			},
 			'keymap': {
 				'prev_tab': 'Control + Page_Up',
