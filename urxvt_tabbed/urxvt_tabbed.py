@@ -236,7 +236,7 @@ class UrxvtTab:
 			self.terminal_process.send_signal(signal.SIGINT)
 			#call wait() so there's no defunct process
 			self.terminal_process.wait()
-		except ProcessLookupError:
+		except OSError:
 			pass
 
 	def on_new_tab_close_click(self, widget):
