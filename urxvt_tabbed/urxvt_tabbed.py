@@ -16,7 +16,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 	the Gtk2::URxvt perl module doesn't seem to be available yet
 	'''
 
-	def __init__(self):
+	def __init__(self, config):
 		super().__init__(title='urxvt')
 
 		vbox = Gtk.VBox()
@@ -45,6 +45,9 @@ class UrxvtTabbedWindow(Gtk.Window):
 		icon_info = Gtk.IconTheme.get_default().lookup_icon('terminal', 48, 0)
 		if icon_info:
 			self.set_icon(icon_info.load_icon())
+
+		#config
+		self.config = config
 
 	def add_new_terminal(self):
 		notebook = self.notebook
