@@ -45,7 +45,7 @@ class Config(dict):
 		if path is None:
 			path=os.path.expanduser('~/.urxvt_tabbed/urxvt_tabbed.conf')
 			if not os.path.exists(path):
-				raise IOError('path does not exist', path)
+				raise OSError('path does not exist', path)
 		config = configparser.ConfigParser()
 		config.read(path)
 		config_dict = {}
