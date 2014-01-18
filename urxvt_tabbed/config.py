@@ -3,10 +3,14 @@ import os
 import configparser
 from collections import namedtuple
 from gi.repository import Gtk, Gdk, GObject, GdkX11
+from gi.overrides import keysyms
 
-class KeyboardShortcut(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
+class KeyPress(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
 	@classmethod
 	def parse(cls, s):
+		'''
+		allows None values
+		'''
 		s_vals = list(map(str.strip, s.split('+')))
 		modifier_flags = 0
 		modifier_map = {
@@ -17,15 +21,18 @@ class KeyboardShortcut(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))
 			'Hyper': Gdk.ModifierType.HYPER_MASK,
 			'Meta': Gdk.ModifierType.META_MASK,
 		}
-		for modifier in s_vals[:-1]:
+		if s_vals:
+			for modifier in s_vals[:-1]:
+				try:
+					modifier_flags |= modifier_map[modifier]
+				except KeyError:
+					raise ValueError('unknown modifier', modifier)
 			try:
-				modifier_flags |= modifier_map[modifier]
-			except KeyError:
-				raise ValueError('unknown modifier', modifier)
-		try:
-			key = s_vals[-1]
-		except IndexError:
-			raise ValueError('no key specified')
+				key = getattr(keysyms, s_vals[-1])
+			except AttributeError:
+				raise ValueError('unknown key')
+		else:
+			key = None
 		return cls(modifier_flags, key)
 
 
@@ -57,7 +64,7 @@ class Config(dict):
 		try:
 			keymap = config['keymap']
 			for key, val in keymap.items():
-				keymap[key] = KeyboardShortcut.parse(val)
+				keymap[key] = KeyPress.parse(val)
 		except KeyError:
 			pass
 		return cls(config)

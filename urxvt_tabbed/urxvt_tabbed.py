@@ -7,6 +7,7 @@ from gi.repository import Gtk, Gdk, GObject, GdkX11
 
 from .gdk_events import GdkEvents
 from .tab_label import ClosableTabLabel
+from .config import KeyPress
 
 gdk_events = GdkEvents()
 
@@ -29,6 +30,9 @@ class UrxvtTabbedWindow(Gtk.Window):
 		vbox.pack_start(notebook, True, True, 0)
 		self.notebook = notebook
 
+		#tabs
+		self.tabs = []
+
 		#new tab button
 		new_tab_button = Gtk.Button()
 		new_tab_button.set_relief(Gtk.ReliefStyle.NONE)
@@ -39,7 +43,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 		self.connect('delete_event', self.on_delete_event)
 
 		#add new tab (otherwise the notebook won't appear)
-		self.add_new_terminal()
+		self.add_terminal()
 
 		#set window icon
 		icon_info = Gtk.IconTheme.get_default().lookup_icon('terminal', 48, 0)
@@ -49,16 +53,24 @@ class UrxvtTabbedWindow(Gtk.Window):
 		#config
 		self.config = config
 
-	def add_new_terminal(self):
+		#keyboard shortcuts
+		self.connect('key-press-event', self.on_key_press)
+
+	def add_terminal(self):
 		notebook = self.notebook
 		urxvt_tab = UrxvtTab()
 		notebook.append_page(urxvt_tab.rxvt_socket, urxvt_tab.label)
 		notebook.set_tab_reorderable(urxvt_tab.rxvt_socket, 1)
 		urxvt_tab.rxvt_socket.show_all()
 		notebook.set_current_page(notebook.page_num(urxvt_tab.rxvt_socket))
+		self.tabs.append(urxvt_tab)
+
+	def close_terminal(self, i):
+		self.tabs[i].close()
+		self.tabs.pop(i)
 
 	def on_new_tab_click(self, widget):
-		self.add_new_terminal()
+		self.add_terminal()
 
 	def on_delete_event(self, widget, data):
 		children = self.notebook.get_children()
@@ -81,6 +93,19 @@ class UrxvtTabbedWindow(Gtk.Window):
 			else:
 				dialog.destroy()
 				return True
+
+	def on_key_press(self, label_entry, event, data=None):
+		keymap = self.config['keymap']
+		keypress = KeyPress(event.state, event.keyval)
+		if keypress == keymap['new_tab']:
+			self.add_terminal()
+		elif keypress == keymap['close_tab']:
+			self.close_terminal(self.notebook.get_current_page())
+		elif keypress == keymap['prev_tab']:
+			#prev_page() doens't switch to the last tab on the first tab
+			self.notebook.set_current_page((self.notebook.get_current_page()-1)%len(self.tabs))
+		elif keypress == keymap['next_tab']:
+			self.notebook.set_current_page((self.notebook.get_current_page()+1)%len(self.tabs))
 
 
 class UrxvtTab:
