@@ -142,9 +142,6 @@ class ClosableTabLabel(Gtk.Box):
 			self.label_edit_focus()
 
 	def on_label_entry_key_press(self, label_entry, event, data=None):
-		'''
-		restore label after enter is pressed
-		'''
 		if event.keyval==keysyms.Return:
 			#enter key press
 			self.label_edit_submit()
