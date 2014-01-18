@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+from gi.repository import Gtk, Gdk, GObject, GdkX11
+
+from urxvt_tabbed.urxvt_tabbed import UrxvtTabbedWindow
+
+def main():
+	tabbed_window = UrxvtTabbedWindow()
+	tabbed_window.maximize()
+	tabbed_window.show_all()
+	Gtk.main()
+
+if __name__=='__main__':
+	main()
