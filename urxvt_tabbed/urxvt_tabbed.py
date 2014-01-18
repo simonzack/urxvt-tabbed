@@ -193,10 +193,13 @@ class UrxvtTab:
 		self.user_set_title(self.label.get_text())
 
 	def close(self):
-		#this detaches the gdk event listener as well, see docs for on_gdk_event()
-		self.terminal_process.send_signal(signal.SIGINT)
-		#call wait() so there's no defunct process
-		self.terminal_process.wait()
+		try:
+			#this detaches the gdk event listener as well, see docs for on_gdk_event()
+			self.terminal_process.send_signal(signal.SIGINT)
+			#call wait() so there's no defunct process
+			self.terminal_process.wait()
+		except ProcessLookupError:
+			pass
 
 	def on_new_tab_close_click(self, widget):
 		self.close()
