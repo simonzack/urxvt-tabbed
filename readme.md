@@ -49,3 +49,6 @@ Other Linux systems:
 
 If you find any bugs, please open an issue.
 I'm happy to accept any pull requests.
+
+## License
+Licensed under GPLv3.
