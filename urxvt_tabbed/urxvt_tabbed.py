@@ -12,7 +12,7 @@ from .config import KeyPress
 gdk_events = GdkEvents()
 
 def is_key_pressed(key, event_key):
-	return event_key.key == key.key and event_key.modifier_flags&key.modifier_flags == key.modifier_flags
+	return event_key.key == key.key and event_key.modifier_flags == key.modifier_flags
 
 class UrxvtTabbedWindow(Gtk.Window):
 	'''
@@ -107,6 +107,18 @@ class UrxvtTabbedWindow(Gtk.Window):
 			self.notebook.set_current_page((self.notebook.get_current_page()-1)%len(self.tabs))
 		elif is_key_pressed(keymap['next_tab'], event_key):
 			self.notebook.set_current_page((self.notebook.get_current_page()+1)%len(self.tabs))
+		elif is_key_pressed(keymap['move_tab_prev'], event_key):
+			tabs = self.tabs
+			old_pos = self.notebook.get_current_page()
+			new_pos = (old_pos - 1 + len(tabs)) % len(tabs)
+			tabs[old_pos], tabs[new_pos] = tabs[new_pos], tabs[old_pos]
+			self.notebook.reorder_child(tabs[new_pos].rxvt_socket, new_pos)
+		elif is_key_pressed(keymap['move_tab_next'], event_key):
+			tabs = self.tabs
+			old_pos = self.notebook.get_current_page()
+			new_pos = (old_pos + 1 + len(tabs)) % len(tabs)
+			tabs[old_pos], tabs[new_pos] = tabs[new_pos], tabs[old_pos]
+			self.notebook.reorder_child(tabs[new_pos].rxvt_socket, new_pos)
 
 	def on_page_removed(self, notebook, tab, page_num):
 		self.tabs.pop(page_num)
