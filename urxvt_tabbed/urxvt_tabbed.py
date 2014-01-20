@@ -33,6 +33,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 		vbox.pack_start(notebook, True, True, 0)
 		self.notebook = notebook
 		self.notebook.connect('page-removed', self.on_page_removed)
+		self.notebook.connect('page-reordered', self.on_page_reordered)
 		self.tabs = []
 
 		#new tab button
@@ -108,19 +109,15 @@ class UrxvtTabbedWindow(Gtk.Window):
 		elif is_key_pressed(keymap['next_tab'], event_key):
 			self.notebook.set_current_page((self.notebook.get_current_page()+1)%len(self.tabs))
 		elif is_key_pressed(keymap['move_tab_prev'], event_key):
-			tabs = self.tabs
-			old_pos = self.notebook.get_current_page()
-			new_pos = (old_pos - 1 + len(tabs)) % len(tabs)
-			tabs[old_pos], tabs[new_pos] = tabs[new_pos], tabs[old_pos]
-			self.notebook.reorder_child(tabs[new_pos].rxvt_socket, new_pos)
+			old_page_num = self.notebook.get_current_page()
+			new_page_num = (old_page_num-1)%len(self.tabs)
+			self.notebook.reorder_child(self.tabs[old_page_num].rxvt_socket, new_page_num)
 		elif is_key_pressed(keymap['move_tab_next'], event_key):
-			tabs = self.tabs
-			old_pos = self.notebook.get_current_page()
-			new_pos = (old_pos + 1 + len(tabs)) % len(tabs)
-			tabs[old_pos], tabs[new_pos] = tabs[new_pos], tabs[old_pos]
-			self.notebook.reorder_child(tabs[new_pos].rxvt_socket, new_pos)
+			old_page_num = self.notebook.get_current_page()
+			new_page_num = (old_page_num+1)%len(self.tabs)
+			self.notebook.reorder_child(self.tabs[old_page_num].rxvt_socket, new_page_num)
 
-	def on_page_removed(self, notebook, tab, page_num):
+	def on_page_removed(self, notebook, tab_widget, page_num):
 		self.tabs.pop(page_num)
 		#check if there are any more terminals left
 		if not self.tabs:
@@ -131,6 +128,12 @@ class UrxvtTabbedWindow(Gtk.Window):
 				self.add_terminal()
 			elif config_close_last_tab == 'close':
 				self.close()
+
+	def on_page_reordered(self, notebook, tab_widget, new_page_num):
+		#gtk doesn't provide a way to get the old page num
+		tabs = self.tabs
+		old_page_num = next(i for i, tab in enumerate(tabs) if tab.rxvt_socket == tab_widget)
+		tabs[old_page_num], tabs[new_page_num] = tabs[new_page_num], tabs[old_page_num]
 
 
 class UrxvtTab:
