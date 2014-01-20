@@ -3,7 +3,7 @@ import subprocess
 import signal
 import Xlib
 import Xlib.display
-from gi.repository import Gtk, Gdk, GObject, GdkX11
+from gi.repository import Gtk, Gdk, GObject, GdkX11, Pango
 
 from .gdk_events import GdkEvents
 from .tab_label import ClosableTabLabel
@@ -23,6 +23,9 @@ class UrxvtTabbedWindow(Gtk.Window):
 
 	def __init__(self, config):
 		super().__init__(title='urxvt')
+
+		#config
+		self.config = config
 
 		vbox = Gtk.VBox()
 		self.add(vbox)
@@ -54,15 +57,18 @@ class UrxvtTabbedWindow(Gtk.Window):
 		if icon_info:
 			self.set_icon(icon_info.load_icon())
 
-		#config
-		self.config = config
-
 		#keyboard shortcuts
 		self.connect('key-press-event', self.on_key_press)
 
 	def add_terminal(self):
+		config = self.config
+		font = 'monospace'
+		if 'ui' in config and 'font' in config['ui']:
+			font = config['ui']['font']
+
 		notebook = self.notebook
 		urxvt_tab = UrxvtTab()
+		urxvt_tab.label.label.modify_font(Pango.FontDescription(font))
 		notebook.append_page(urxvt_tab.rxvt_socket, urxvt_tab.label)
 		notebook.set_tab_reorderable(urxvt_tab.rxvt_socket, 1)
 		urxvt_tab.rxvt_socket.show_all()

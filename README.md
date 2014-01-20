@@ -43,6 +43,23 @@ Other Linux systems:
 - `Control + Shift + T` - New tab
 - `Control + F4` - Close tab
 
+## Configuration
+
+The configuration is read from `~/.urxvt_tabbed/urxvt_tabbed.conf` with the following format:
+
+```ini
+[section]
+foo = bar
+```
+
+### `ui` section
+
+* `font`: [font description][font-desc] used for UI, default is `monospace`.
+
+    You can try something like `Inconsolata 12` or `Envy Code R italic 16`.
+
+[font-desc]: http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
+
 ## Screenshots
 
 ![Multiple tabs](https://raw2.github.com/simonzack/urxvt-tabbed/master/screenshots/screenshot.png)
