@@ -12,7 +12,8 @@ from .config import KeyPress
 gdk_events = GdkEvents()
 
 def is_key_pressed(key, event_key):
-	return event_key.key == key.key and event_key.modifier_flags == key.modifier_flags
+	#ignore num_lock (Gdk.ModifierType.MOD2_MASK)
+	return event_key.key == key.key and event_key.modifier_flags&(~Gdk.ModifierType.MOD2_MASK) == key.modifier_flags
 
 class UrxvtTabbedWindow(Gtk.Window):
 	'''
