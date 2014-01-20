@@ -134,7 +134,8 @@ class UrxvtTabbedWindow(Gtk.Window):
 		#gtk doesn't provide a way to get the old page num
 		tabs = self.tabs
 		old_page_num = next(i for i, tab in enumerate(tabs) if tab.rxvt_socket == tab_widget)
-		tabs[old_page_num], tabs[new_page_num] = tabs[new_page_num], tabs[old_page_num]
+		tab = tabs.pop(old_page_num)
+		tabs.insert(new_page_num, tab)
 
 
 class UrxvtTab:
