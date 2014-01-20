@@ -49,7 +49,7 @@ Other Linux systems:
 
 ## Contributing
 
-If you find any bugs, please open an issue.
+If you find any bugs or have any feature requests, please open an issue.
 I'm happy to accept any pull requests.
 
 ## License
