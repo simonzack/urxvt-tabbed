@@ -38,6 +38,8 @@ Other Linux systems:
 ## Keys
 - `Control + Page_Up` - Previous tab
 - `Control + Page_Down` - Next tab
+- `Control + Shift + Page_Up` - Move current tab before previous tab
+- `Control + Shift + Page_Down` - Move current tab after next tab
 - `Control + Shift + T` - New tab
 - `Control + F4` - Close tab
 

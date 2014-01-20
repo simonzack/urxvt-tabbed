@@ -104,6 +104,8 @@ class ConfigDefaults(Config):
 			'keymap': {
 				'prev_tab': 'Control + Page_Up',
 				'next_tab': 'Control + Page_Down',
+				'move_tab_prev': 'Control + Shift + Page_Up',
+				'move_tab_next': 'Control + Shift + Page_Down',
 				'new_tab': 'Control + Shift + T',
 				'close_tab': 'Control + F4',
 			}
