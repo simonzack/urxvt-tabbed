@@ -79,7 +79,7 @@ class ConfigDefaults(Config):
 		defaults = self.defaults()
 		for default_section_name, default_section in defaults.items():
 			if default_section_name in config:
-				config_section = config[default_section]
+				config_section = config[default_section_name]
 				for default_key, default_val in default_section.items():
 					if default_key not in config_section:
 						config_section[default_key] = default_val
