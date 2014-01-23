@@ -35,14 +35,6 @@ Other Linux systems:
 - `cd urxvt-tabbed`
 - `./bin/urxvt-tabbed`
 
-## Keys
-- `Control + Page_Up` - Previous tab
-- `Control + Page_Down` - Next tab
-- `Control + Shift + Page_Up` - Move current tab before previous tab
-- `Control + Shift + Page_Down` - Move current tab after next tab
-- `Control + Shift + T` - New tab
-- `Control + F4` - Close tab
-
 ## Configuration
 
 The configuration is read from `~/.urxvt_tabbed/urxvt_tabbed.conf`, which uses the ini format:
@@ -52,11 +44,22 @@ The configuration is read from `~/.urxvt_tabbed/urxvt_tabbed.conf`, which uses t
 foo = bar
 ```
 
-### `[ui]`
+### [ui]
 
-* `font`: [font description][font-desc] used for UI, e.g. `Monospace`, `Inconsolata 12` or `Envy Code R italic 16`. Defaults come from gtk.
+- `font`: [font description][font-desc] used for UI, e.g. `Monospace`, `Inconsolata 12` or `Envy Code R italic 16`. Defaults come from gtk.
 
 [font-desc]: http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
+
+### [general]
+- `close_last_tab`: One of `new`, `close`, `blank`
+
+### [keymap]
+- `prev_tab`: Previous tab, defaults to `Control + Page_Up`
+- `next_tab`: Next tab, defaults to `Control + Page_Down`
+- `move_tab_prev`: Move tab left, defaults to `Control + Shift + Page_Up`
+- `move_tab_next`: Move tab right, defaults to `Control + Shift + Page_Down`
+- `new_tab`: New tab, defaults to `Control + Shift + T`
+- `close_tab`: Close tab, defaults to `Control + F4`
 
 ## Screenshots
 
