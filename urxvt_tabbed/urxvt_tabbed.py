@@ -61,10 +61,11 @@ class UrxvtTabbedWindow(Gtk.Window):
 		self.connect('key-press-event', self.on_key_press)
 
 	def add_terminal(self):
-		config = self.config
+		font = Pango.FontDescription(self.config['ui']['font'])
 		notebook = self.notebook
 		urxvt_tab = UrxvtTab()
-		urxvt_tab.label.label.modify_font(Pango.FontDescription(config['ui']['font']))
+		urxvt_tab.label.label.modify_font(font)
+		urxvt_tab.label.label_entry.modify_font(font)
 		notebook.append_page(urxvt_tab.rxvt_socket, urxvt_tab.label)
 		notebook.set_tab_reorderable(urxvt_tab.rxvt_socket, 1)
 		urxvt_tab.rxvt_socket.show_all()
