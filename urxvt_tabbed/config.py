@@ -108,6 +108,7 @@ class ConfigDefaults(Config):
 				'move_tab_next': 'Control + Shift + Page_Down',
 				'new_tab': 'Control + Shift + T',
 				'close_tab': 'Control + F4',
+				'edit_tab': 'Control + Shift + E',
 			},
 			'ui': {
 				'font': '',

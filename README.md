@@ -60,6 +60,7 @@ foo = bar
 - `move_tab_next`: Move tab right, defaults to `Control + Shift + Page_Down`
 - `new_tab`: New tab, defaults to `Control + Shift + T`
 - `close_tab`: Close tab, defaults to `Control + F4`
+- `edit_tab`: Edit tab label, defaults to `Control + Shift + E`
 
 ## Screenshots
 
