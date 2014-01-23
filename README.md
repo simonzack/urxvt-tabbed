@@ -45,18 +45,16 @@ Other Linux systems:
 
 ## Configuration
 
-The configuration is read from `~/.urxvt_tabbed/urxvt_tabbed.conf` with the following format:
+The configuration is read from `~/.urxvt_tabbed/urxvt_tabbed.conf`, which uses the ini format:
 
 ```ini
 [section]
 foo = bar
 ```
 
-### `ui` section
+### `[ui]`
 
-* `font`: [font description][font-desc] used for UI, default is `monospace`.
-
-    You can try something like `Inconsolata 12` or `Envy Code R italic 16`.
+* `font`: [font description][font-desc] used for UI, e.g. `Monospace`, `Inconsolata 12` or `Envy Code R italic 16`. Defaults come from gtk.
 
 [font-desc]: http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
 
