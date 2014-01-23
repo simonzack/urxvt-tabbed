@@ -130,7 +130,11 @@ class UrxvtTabbedWindow(Gtk.Window):
 			elif config_close_last_tab == 'new':
 				self.add_terminal()
 			elif config_close_last_tab == 'close':
-				self.emit("delete-event", Gdk.Event(Gdk.EventType.DELETE))
+				try:
+					#from gtk 3.10
+					self.close()
+				except AttributeError:
+					self.emit('delete-event', Gdk.Event(Gdk.EventType.DELETE))
 
 	def on_page_reordered(self, notebook, tab_widget, new_page_num):
 		#gtk doesn't provide a way to get the old page num
