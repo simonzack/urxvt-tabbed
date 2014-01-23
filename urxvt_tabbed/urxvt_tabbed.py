@@ -119,6 +119,8 @@ class UrxvtTabbedWindow(Gtk.Window):
 			old_page_num = self.notebook.get_current_page()
 			new_page_num = (old_page_num+1)%len(self.tabs)
 			self.notebook.reorder_child(self.tabs[old_page_num].rxvt_socket, new_page_num)
+		elif is_key_pressed(keymap['edit_tab'], event_key):
+			self.tabs[self.notebook.get_current_page()].label.label_edit_focus()
 
 	def on_page_removed(self, notebook, tab_widget, page_num):
 		self.tabs.pop(page_num)
