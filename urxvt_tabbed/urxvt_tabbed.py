@@ -62,13 +62,9 @@ class UrxvtTabbedWindow(Gtk.Window):
 
 	def add_terminal(self):
 		config = self.config
-		font = 'monospace'
-		if 'ui' in config and 'font' in config['ui']:
-			font = config['ui']['font']
-
 		notebook = self.notebook
 		urxvt_tab = UrxvtTab()
-		urxvt_tab.label.label.modify_font(Pango.FontDescription(font))
+		urxvt_tab.label.label.modify_font(Pango.FontDescription(config['ui']['font']))
 		notebook.append_page(urxvt_tab.rxvt_socket, urxvt_tab.label)
 		notebook.set_tab_reorderable(urxvt_tab.rxvt_socket, 1)
 		urxvt_tab.rxvt_socket.show_all()
