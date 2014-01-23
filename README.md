@@ -70,5 +70,8 @@ foo = bar
 If you find any bugs or have any feature requests, please open an issue.
 I'm happy to accept any pull requests.
 
+## Contributors
+Thanks to everybody who [contributed](https://github.com/simonzack/urxvt-tabbed/graphs/contributors)!
+
 ## License
 Licensed under GPLv3.
