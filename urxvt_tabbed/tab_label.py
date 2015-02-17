@@ -1,6 +1,5 @@
 
 from gi.repository import Gtk, Gdk, GObject, GdkX11
-from gi.overrides import keysyms
 
 class ClosableTabLabel(Gtk.Box):
 	__gsignals__ = {
@@ -92,10 +91,10 @@ class ClosableTabLabel(Gtk.Box):
 			self.label_edit_focus()
 
 	def on_label_entry_key_press(self, label_entry, event, data=None):
-		if event.keyval==keysyms.Return:
+		if event.keyval==Gdk.KEY_Return:
 			#enter key press
 			self.label_edit_submit()
-		elif event.keyval==keysyms.Escape:
+		elif event.keyval==Gdk.KEY_Escape:
 			#enter key press
 			self.label_edit_blur()
 

@@ -3,6 +3,7 @@ import subprocess
 import signal
 import Xlib
 import Xlib.display
+
 from gi.repository import Gtk, Gdk, GObject, GdkX11, Pango
 
 from .gdk_events import GdkEvents

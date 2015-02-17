@@ -3,7 +3,6 @@ import os
 import configparser
 from collections import namedtuple
 from gi.repository import Gtk, Gdk, GObject, GdkX11
-from gi.overrides import keysyms
 
 class KeyPress(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
 	@classmethod
@@ -28,7 +27,7 @@ class KeyPress(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
 				except KeyError:
 					raise ValueError('unknown modifier', modifier)
 			try:
-				key = getattr(keysyms, s_vals[-1])
+				key = getattr(Gdk, 'KEY_{}'.format(s_vals[-1]))
 			except AttributeError:
 				raise ValueError('unknown key')
 		else:
