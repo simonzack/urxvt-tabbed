@@ -54,7 +54,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 		self.add_terminal()
 
 		#set window icon
-		icon_info = Gtk.IconTheme.get_default().lookup_icon('terminal', 48, 0)
+		icon_info = Gtk.IconTheme.get_default().lookup_icon('utilities-terminal', 48, 0)
 		if icon_info:
 			self.set_icon(icon_info.load_icon())
 
