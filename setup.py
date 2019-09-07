@@ -8,7 +8,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding
 
 setup(
 	name='urxvt_tabbed',
-	version='0.2.0',
+	version='1.0.0',
 	license='GPLv3',
 	description='Tab wrapper for urxt',
 	long_description=long_description,
@@ -24,7 +24,7 @@ setup(
 	scripts=['bin/urxvt-tabbed'],
 
 	classifiers = [
-		'Development Status :: 4 - Beta',
+		'Development Status :: 5 - Production/Stable',
 		'Intended Audience :: End Users/Desktop',
 		'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 		'Programming Language :: Python :: 3',
