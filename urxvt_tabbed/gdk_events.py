@@ -1,6 +1,5 @@
 from gi.repository import Gdk, Gtk
 
-
 class GdkEvents:
 	'''
 	Event filters are not used due to [this bug](https://bugzilla.gnome.org/show_bug.cgi?id=687898).
