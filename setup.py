@@ -8,7 +8,7 @@ try:
 
 	with open('README.md') as file:
 		long_description = pypandoc.convert(file.read(), 'rst', format='md')
-		#pandoc bug workaround
+		# pandoc bug workaround
 		long_description = re.sub(r'(:alt:\s*(.+)\s*\r?\n)\s*\r?\n\s*\2', r'\1', long_description)
 
 except ImportError:

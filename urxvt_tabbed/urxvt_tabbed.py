@@ -13,25 +13,24 @@ gdk_events = GdkEvents()
 
 
 def is_key_pressed(key, event_key):
-	#ignore num_lock (Gdk.ModifierType.MOD2_MASK)
+	# Ignore num_lock (Gdk.ModifierType.MOD2_MASK)
 	return event_key.key == key.key and event_key.modifier_flags&(~Gdk.ModifierType.MOD2_MASK) == key.modifier_flags
 
 class UrxvtTabbedWindow(Gtk.Window):
 	'''
-	Wrapper around urxvt which adds tabs
-	the Gtk2::URxvt perl module doesn't seem to be available yet
+	Wrapper around urxvt which adds tabs.
 	'''
 
 	def __init__(self, config):
 		super().__init__(title='urxvt')
 
-		#config
+		# Config
 		self.config = config
 
 		vbox = Gtk.VBox()
 		self.add(vbox)
 
-		#tabs container
+		# Tabs container
 		notebook = Gtk.Notebook()
 		notebook.set_can_focus(False)
 		notebook.set_scrollable(True)
@@ -41,7 +40,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 		self.notebook.connect('page-reordered', self.on_page_reordered)
 		self.tabs = []
 
-		#new tab button
+		# New tab button
 		new_tab_button = Gtk.Button()
 		new_tab_button.set_relief(Gtk.ReliefStyle.NONE)
 		new_tab_button.add(Gtk.Image.new_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU))
@@ -50,15 +49,15 @@ class UrxvtTabbedWindow(Gtk.Window):
 		notebook.set_action_widget(new_tab_button, Gtk.PackType.END)
 		self.connect('delete_event', self.on_delete_event)
 
-		#add new tab (otherwise the notebook won't appear)
+		# Add new tab (otherwise the notebook won't appear)
 		self.add_terminal()
 
-		#set window icon
+		# Set window icon
 		icon_info = Gtk.IconTheme.get_default().lookup_icon('utilities-terminal', 48, 0)
 		if icon_info:
 			self.set_icon(icon_info.load_icon())
 
-		#keyboard shortcuts
+		# Keyboard shortcuts
 		self.connect('key-press-event', self.on_key_press)
 
 	def add_terminal(self):
@@ -83,10 +82,10 @@ class UrxvtTabbedWindow(Gtk.Window):
 		children = self.notebook.get_children()
 		num_tabs = len(children)
 		if num_tabs <= 1:
-			#close window if there's only a single tab
+			# Close window if there's only a single tab
 			Gtk.main_quit()
 		else:
-			#ask the user to close all tabs or not
+			# Ask the user to close all tabs or not
 			dialog = Gtk.MessageDialog(
 				flags=Gtk.DialogFlags.MODAL,
 				type=Gtk.MessageType.QUESTION,
@@ -109,7 +108,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 		elif is_key_pressed(keymap['close_tab'], event_key):
 			self.close_terminal(self.notebook.get_current_page())
 		elif is_key_pressed(keymap['prev_tab'], event_key):
-			#prev_page() doens't switch to the last tab on the first tab
+			# prev_page() doens't switch to the last tab on the first tab
 			self.notebook.set_current_page((self.notebook.get_current_page()-1)%len(self.tabs))
 		elif is_key_pressed(keymap['next_tab'], event_key):
 			self.notebook.set_current_page((self.notebook.get_current_page()+1)%len(self.tabs))
@@ -126,7 +125,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 
 	def on_page_removed(self, notebook, tab_widget, page_num):
 		self.tabs.pop(page_num)
-		#check if there are any more terminals left
+		# Check if there are any more terminals left
 		if not self.tabs:
 			config_close_last_tab = self.config['general']['close_last_tab']
 			if config_close_last_tab == 'blank':
@@ -135,13 +134,13 @@ class UrxvtTabbedWindow(Gtk.Window):
 				self.add_terminal()
 			elif config_close_last_tab == 'close':
 				try:
-					#from gtk 3.10
+					# From gtk 3.10
 					self.close()
 				except AttributeError:
 					self.emit('delete-event', Gdk.Event(Gdk.EventType.DELETE))
 
 	def on_page_reordered(self, notebook, tab_widget, new_page_num):
-		#gtk doesn't provide a way to get the old page num
+		# gtk doesn't provide a way to get the old page num
 		tabs = self.tabs
 		old_page_num = next(i for i, tab in enumerate(tabs) if tab.rxvt_socket == tab_widget)
 		tab = tabs.pop(old_page_num)
@@ -157,25 +156,25 @@ class UrxvtTab:
 		label.connect('label_edit_submit', self.on_label_edit_submit)
 		label.connect('label_edit_blur', self.on_label_edit_blur)
 		self.label = label
-		#embedded terminal
+		# Embedded terminal
 		rxvt_socket = Gtk.Socket()
 		self.rxvt_socket = rxvt_socket
 		rxvt_socket.set_can_focus(True)
-		#pygobject has some strange bug where if self is directory used then self fields won't exist
+		# pygobject has some strange bug where if self is directory used then self fields won't exist
 		rxvt_socket.connect_after('realize', lambda *args, **kwargs: self.on_realize(*args, **kwargs))
 		rxvt_socket.connect_after('plug_added', lambda *args, **kwargs: self.on_plug_added(*args, **kwargs))
 		rxvt_socket.connect_after('map_event', lambda *args, **kwargs: self.on_map_event(*args, **kwargs))
 		self.event_listener_id = None
 		self.plugged = None
 		self.terminal_process = None
-		#tab labels
+		# Tab labels
 		self.shell_title = title
 		self.has_custom_title = False
 
 	def update_tab_geometry_hints(self):
 		'''
-		copy the WM_NORMAL_HINTS properties of rxvt window to the rxvt tab so it stays within the rxvt resizing requirements
-		resizing might not be smooth anymore if this is called
+		Copy the WM_NORMAL_HINTS properties of rxvt window to the rxvt tab so it stays within the rxvt resizing
+		requirements. Resizing might not be smooth anymore if this is called.
 		'''
 		rxvt_socket = self.rxvt_socket
 		display = Xlib.display.Display()
@@ -193,7 +192,7 @@ class UrxvtTab:
 
 	def on_realize(self, rxvt_socket):
 		'''
-		creates a urxvt instance and embed it in widget
+		Creates a urxvt instance and embed it in widget.
 		'''
 		xid = rxvt_socket.get_window().get_xid()
 		self.terminal_process = subprocess.Popen([self.RXVT_BASENAME, '-embed', str(xid)])
@@ -205,17 +204,17 @@ class UrxvtTab:
 
 	def on_plug_added(self, rxvt_socket):
 		'''
-		runs when the urxvt embedded process attaches a plug to the socket specified by the xid
-			(passed to it as a command-line argument)
+		Runs when the urxvt embedded process attaches a plug to the socket specified by the xid (passed to it as a
+		command-line argument).
 		'''
 		plugged = rxvt_socket.get_plug_window()
 		if plugged is None:
 			return
 		self.plugged = plugged
 		self.update_tab_geometry_hints()
-		#listen to gdk property change events
+		# Listen to gdk property change events
 		plugged.set_events(plugged.get_events()|Gdk.EventMask.PROPERTY_CHANGE_MASK)
-		#urxvt only uses x.org, so only gdk events can be used
+		# urxvt only uses x.org, so only gdk events can be used
 		self.event_listener_id = gdk_events.add_event_listener(self.on_gdk_event)
 		return False
 
@@ -224,7 +223,7 @@ class UrxvtTab:
 			self.label.set_text(title)
 
 	def user_set_title(self, title):
-		#only use the user specified label if it isn't empty
+		# Only use the user specified label if it isn't empty
 		if title:
 			self.has_custom_title = True
 			self.label.set_text(title)
@@ -234,8 +233,8 @@ class UrxvtTab:
 
 	def on_gdk_event(self, event):
 		'''
-		events are also created when the urxvt plugged window closes,
-			this handler disconnects itself when it recieves the event
+		Events are also created when the urxvt plugged window closes, this handler disconnects itself when it
+		recieves the event.
 		'''
 		try:
 			if event.type == Gdk.EventType.CONFIGURE:
@@ -243,14 +242,15 @@ class UrxvtTab:
 			elif event.type == Gdk.EventType.PROPERTY_NOTIFY:
 				if event.state == Gdk.PropertyState.NEW_VALUE:
 					if event.atom.name() == '_NET_WM_NAME':
-						#window name change event, set tab title
+						# Window name change event, set tab title
 						display = Xlib.display.Display()
 						xlib_window = display.create_resource_object('window', self.plugged.get_xid())
 						title = xlib_window.get_wm_name()
 						self.shell_title = title
 						self.shell_set_title(title)
 		except Xlib.error.BadWindow:
-			#the plug window has now closed itself (there are no events indicating this, so catch the exception instead)
+			# The plug window has now closed itself (there are no events indicating this, so catch the exception
+            # instead)
 			gdk_events.remove_event_listener(self.event_listener_id)
 			self.close()
 
@@ -262,9 +262,9 @@ class UrxvtTab:
 
 	def close(self):
 		try:
-			#this detaches the gdk event listener as well, see docs for on_gdk_event()
+			# This detaches the gdk event listener as well, see docs for on_gdk_event()
 			self.terminal_process.send_signal(signal.SIGINT)
-			#call wait() so there's no defunct process
+			# Call wait() so there's no defunct process
 			self.terminal_process.wait()
 		except OSError:
 			pass

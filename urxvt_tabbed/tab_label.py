@@ -3,17 +3,17 @@ from gi.repository import Gdk, GObject, Gtk
 
 class ClosableTabLabel(Gtk.Box):
 	__gsignals__ = {
-		"close_clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
-		"label_edit_focus": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
-		"label_edit_blur": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
-		"label_edit_submit": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+		'close_clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+		'label_edit_focus': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+		'label_edit_blur': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
+		'label_edit_submit': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ()),
 	}
 
 	def __init__(self, label_text):
 		super().__init__()
 		self.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-		#label
+		# Label
 		label_event_box = Gtk.EventBox()
 		self.label = Gtk.Label(label_text)
 		label_event_box.add(self.label)
@@ -26,7 +26,7 @@ class ClosableTabLabel(Gtk.Box):
 		self.label_entry.connect('changed', self.on_label_entry_changed)
 		self.pack_start(self.label_entry, True, True, 0)
 
-		#close button
+		# Close button
 		button = Gtk.Button()
 		button.set_relief(Gtk.ReliefStyle.NONE)
 		button.set_focus_on_click(False)
@@ -38,12 +38,12 @@ class ClosableTabLabel(Gtk.Box):
 			'}'
 		provider = Gtk.CssProvider()
 		provider.load_from_data(data.encode())
-		#GTK_STYLE_PROVIDER_PRIORITY_APPLICATION = 600
+		# GTK_STYLE_PROVIDER_PRIORITY_APPLICATION = 600
 		button.get_style_context().add_provider(provider, 600)
 		self.button = button
 		self.pack_start(button, False, False, 0)
 
-		#show all
+		# Show all
 		self.show_all()
 		self.label_entry.hide()
 
@@ -63,7 +63,7 @@ class ClosableTabLabel(Gtk.Box):
 		label_text = self.label.get_text()
 		self.label_entry.set_width_chars(len(label_text))
 		self.label_entry.set_text(label_text)
-		#select all text
+		# Select all text
 		self.label_entry.emit('move-cursor', 1, len(label_text), True)
 		self.emit('label_edit_focus')
 
@@ -80,28 +80,28 @@ class ClosableTabLabel(Gtk.Box):
 
 	def on_label_button_press(self, event_box, event, data=None):
 		'''
-		edit label on double click
+		Edit label on double click
 		'''
-		if event.type==Gdk.EventType._2BUTTON_PRESS:
+		if event.type == Gdk.EventType._2BUTTON_PRESS:
 			self.label_edit_focus()
 
 	def on_label_entry_key_press(self, label_entry, event, data=None):
 		if event.keyval==Gdk.KEY_Return:
-			#enter key press
+			# Enter key press
 			self.label_edit_submit()
 		elif event.keyval==Gdk.KEY_Escape:
-			#enter key press
+			# Enter key press
 			self.label_edit_blur()
 
 	def on_label_entry_focus_out(self, label_entry, event, data=None):
 		'''
-		restore label after focus out
+		Restore label after focus out
 		'''
 		self.label_edit_blur()
 
 	def on_label_entry_changed(self, label_entry, data=None):
 		'''
-		adapt label size
+		Adapt label size
 		'''
 		label_text = self.label_entry.get_text()
 		self.label_entry.set_width_chars(len(label_text))

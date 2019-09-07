@@ -10,7 +10,7 @@ class KeyPress(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
 	@classmethod
 	def parse(cls, s):
 		'''
-		allows None values
+		Allows None values.
 		'''
 		s_vals = list(map(str.strip, s.split('+')))
 		modifier_flags = 0
@@ -59,8 +59,8 @@ class Config(dict):
 	@classmethod
 	def parse_strings(cls, config):
 		'''
-		args:
-			config {string: string}
+        Parameters:
+			config ({string: string})
 		'''
 		try:
 			keymap = config['keymap']
@@ -73,10 +73,10 @@ class Config(dict):
 
 class ConfigDefaults(Config):
 	'''
-	config with defaults
+	Config with defaults
 	'''
 	def __init__(self, config):
-		#merge values with default values
+		# Merge values with default values
 		defaults = self.defaults()
 		for default_section_name, default_section in defaults.items():
 			if default_section_name in config:
