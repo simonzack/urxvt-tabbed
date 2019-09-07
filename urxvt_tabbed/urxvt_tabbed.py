@@ -5,9 +5,9 @@ import Xlib
 import Xlib.display
 from gi.repository import Gdk, Gtk, Pango
 
-from .config import KeyPress
-from .gdk_events import GdkEvents
-from .tab_label import ClosableTabLabel
+from urxvt_tabbed.config import KeyPress
+from urxvt_tabbed.gdk_events import GdkEvents
+from urxvt_tabbed.tab_label import ClosableTabLabel
 
 gdk_events = GdkEvents()
 
