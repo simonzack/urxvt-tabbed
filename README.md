@@ -37,7 +37,7 @@ Other Linux systems:
 
 ## Configuration
 
-The configuration is read from `~/.urxvt_tabbed/urxvt_tabbed.conf`, which uses the ini format:
+The configuration is read from `~/.config/urxvt_tabbed/urxvt_tabbed.conf`, which uses the ini format:
 
 ```ini
 [section]

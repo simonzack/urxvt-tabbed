@@ -3,6 +3,7 @@ import os
 from collections import namedtuple
 
 from gi.repository import Gdk
+from xdg.BaseDirectory import xdg_config_home
 
 
 class KeyPress(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
@@ -43,7 +44,7 @@ class Config(dict):
 	@classmethod
 	def parse_path(cls, path=None):
 		if path is None:
-			path=os.path.expanduser('~/.urxvt_tabbed/urxvt_tabbed.conf')
+			path = os.path.join(xdg_config_home, 'urxvt_tabbed/urxvt_tabbed.conf')
 			if not os.path.exists(path):
 				raise OSError('path does not exist', path)
 		config = configparser.ConfigParser()

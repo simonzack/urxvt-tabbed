@@ -25,7 +25,7 @@ setup(
 	author='simonzack',
 	author_email='simonzack@gmail.com',
 
-	install_requires = ['pygobject', 'python3-xlib'],
+	install_requires = ['pygobject', 'python3-xlib', 'pyxdg'],
 
 	packages=find_packages(),
 	scripts=['bin/urxvt-tabbed'],
