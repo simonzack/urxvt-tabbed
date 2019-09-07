@@ -34,11 +34,6 @@ class ClosableTabLabel(Gtk.Box):
 		button.connect('clicked', self.on_close_click)
 		data =  \
 			'.button {' \
-				'-GtkButton-default-border : 0px;' \
-				'-GtkButton-default-outside-border : 0px;' \
-				'-GtkButton-inner-border: 0px;' \
-				'-GtkWidget-focus-line-width : 0px;' \
-				'-GtkWidget-focus-padding : 0px;' \
 				'padding: 0px;' \
 			'}'
 		provider = Gtk.CssProvider()
