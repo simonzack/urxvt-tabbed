@@ -10,14 +10,14 @@ from urxvt_tabbed.urxvt_tabbed import UrxvtTabbedWindow
 from urxvt_tabbed.config import ConfigDefaults
 
 def main():
-	try:
-		config = ConfigDefaults.parse_path()
-	except OSError:
-		config = ConfigDefaults.defaults()
-	tabbed_window = UrxvtTabbedWindow(config)
-	tabbed_window.maximize()
-	tabbed_window.show_all()
-	Gtk.main()
+    try:
+        config = ConfigDefaults.parse_path()
+    except OSError:
+        config = ConfigDefaults.defaults()
+    tabbed_window = UrxvtTabbedWindow(config)
+    tabbed_window.maximize()
+    tabbed_window.show_all()
+    Gtk.main()
 
 if __name__=='__main__':
-	main()
+    main()
