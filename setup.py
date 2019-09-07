@@ -1,18 +1,10 @@
 #!/usr/bin/env python3
-
-import re
 from setuptools import setup, find_packages
+from os import path
 
-try:
-	import pypandoc
 
-	with open('README.md') as file:
-		long_description = pypandoc.convert(file.read(), 'rst', format='md')
-		# pandoc bug workaround
-		long_description = re.sub(r'(:alt:\s*(.+)\s*\r?\n)\s*\r?\n\s*\2', r'\1', long_description)
-
-except ImportError:
-	long_description = ''
+with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
 	name='urxvt_tabbed',
@@ -20,6 +12,7 @@ setup(
 	license='GPLv3',
 	description='Tab wrapper for urxt',
 	long_description=long_description,
+    long_description_content_type='text/markdown',
 	url='https://github.com/simonzack/urxvt-tabbed',
 
 	author='simonzack',
