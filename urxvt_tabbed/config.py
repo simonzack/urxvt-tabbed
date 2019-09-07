@@ -1,4 +1,3 @@
-
 import os
 import configparser
 from collections import namedtuple

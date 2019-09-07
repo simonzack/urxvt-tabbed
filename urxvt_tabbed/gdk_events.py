@@ -1,4 +1,3 @@
-
 from gi.repository import Gtk, Gdk, GObject, GdkX11
 
 class GdkEvents:
