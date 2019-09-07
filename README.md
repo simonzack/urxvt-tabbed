@@ -64,7 +64,7 @@ foo = bar
 
 ## Screenshots
 
-![Multiple tabs](https://raw2.github.com/simonzack/urxvt-tabbed/master/screenshots/screenshot.png)
+![Multiple tabs](https://raw.githubusercontent.com/simonzack/urxvt-tabbed/master/screenshots/screenshot.png)
 
 ## Contributing
 
