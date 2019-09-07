@@ -1,4 +1,5 @@
-from gi.repository import Gtk, Gdk, GObject, GdkX11
+from gi.repository import Gdk, Gtk
+
 
 class GdkEvents:
 	'''

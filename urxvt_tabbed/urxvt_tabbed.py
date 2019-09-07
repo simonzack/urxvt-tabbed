@@ -1,15 +1,16 @@
-import subprocess
 import signal
+import subprocess
+
 import Xlib
 import Xlib.display
+from gi.repository import Gdk, Gtk, Pango
 
-from gi.repository import Gtk, Gdk, GObject, GdkX11, Pango
-
+from .config import KeyPress
 from .gdk_events import GdkEvents
 from .tab_label import ClosableTabLabel
-from .config import KeyPress
 
 gdk_events = GdkEvents()
+
 
 def is_key_pressed(key, event_key):
 	#ignore num_lock (Gdk.ModifierType.MOD2_MASK)

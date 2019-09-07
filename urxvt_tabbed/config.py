@@ -1,7 +1,9 @@
-import os
 import configparser
+import os
 from collections import namedtuple
-from gi.repository import Gtk, Gdk, GObject, GdkX11
+
+from gi.repository import Gdk
+
 
 class KeyPress(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
 	@classmethod

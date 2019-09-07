@@ -1,4 +1,5 @@
-from gi.repository import Gtk, Gdk, GObject, GdkX11
+from gi.repository import Gdk, GObject, Gtk
+
 
 class ClosableTabLabel(Gtk.Box):
 	__gsignals__ = {
