@@ -1,7 +1,6 @@
 import signal
 import subprocess
 
-import Xlib
 import Xlib.display
 from gi.repository import Gdk, Gtk, Pango
 
