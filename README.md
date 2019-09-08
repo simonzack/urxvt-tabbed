@@ -12,28 +12,7 @@ URxvt does provide a rudimentary default gtk tabs implementation using perl, but
 - Customizable keyboard shortcuts.
 
 ## Installation and Use
-
-### Dependencies
-
-- `python-gobject`
-- `python3-xlib`
-
-#### Installing Dependencies
-
-Arch Linux:
-
-- `sudo pacman -S python-gobject`
-- `sudo yaourt -S python3-xlib`
-
-Other Linux systems:
-
-- Install `python-gobject` using your favorite package manager
-- `pip3 install python3-xlib`
-
-### Installing URxvt Tabbed
-- `git clone git@github.com:simonzack/urxvt-tabbed.git`
-- `cd urxvt-tabbed`
-- `./bin/urxvt-tabbed`
+Install the package via `pip` (either the pypi or github version), and run `urxvt-tabbed`.
 
 ## Configuration
 
