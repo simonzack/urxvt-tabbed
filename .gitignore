@@ -1,9 +1,10 @@
-build
-dist
-*.egg-info
+# PyCharm files
+/.idea/**/workspace.xml
 
-#ide files
-.idea
+# build files
+/build/
+/dist/
+/*.egg-info/
 
-#caches
-__pycache__
+# caches
+__pycache__/
