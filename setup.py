@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
 from os import path
 
+from setuptools import find_packages, setup
 
 with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -21,7 +21,7 @@ setup(
     install_requires=['pygobject', 'python-xlib', 'pyxdg'],
 
     packages=find_packages(),
-    scripts=['bin/urxvt-tabbed'],
+    scripts=['bin/urxvt-tabbed-python'],
 
     classifiers = [
         'Development Status :: 5 - Production/Stable',
