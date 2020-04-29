@@ -1,11 +1,9 @@
 # URxvt Tabbed
-
-URxvt terminals with gtk 3 tabs.
-Tabs are implemented by embedding URxvt in a gtk notebook container, using pygobject as an interface to gtk.
-URxvt does provide a rudimentary default gtk tabs implementation using perl, but with limited features (e.g. no tab dragging or tab closing).
+URxvt terminals with GTK tabs.
+Tabs are implemented by embedding URxvt in a GTK notebook container, using pygobject as an interface to GTK.
+URxvt does provide a rudimentary default GTK tabs implementation using perl, but with limited features (e.g. no tab dragging or tab closing).
 
 ##Features
-
 - Tab name editing (double click).
 - Tab closing, drag & drop.
 - Inherits tab titles set by shells.
@@ -15,7 +13,6 @@ URxvt does provide a rudimentary default gtk tabs implementation using perl, but
 Install the package via `pip` (either the pypi or github version), and run `urxvt-tabbed`.
 
 ## Configuration
-
 The configuration is read from `~/.config/urxvt_tabbed/urxvt_tabbed.conf`, which uses the ini format:
 
 ```ini
@@ -25,7 +22,7 @@ foo = bar
 
 ### [ui]
 
-- `font`: [font description][font-desc] used for UI, e.g. `Monospace`, `Inconsolata 12` or `Envy Code R italic 16`. Defaults come from gtk.
+- `font`: [font description][font-desc] used for UI, e.g. `Monospace`, `Inconsolata 12` or `Envy Code R italic 16`. Defaults come from GTK.
 
 [font-desc]: http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
 
@@ -46,7 +43,6 @@ foo = bar
 ![Multiple tabs](https://raw.githubusercontent.com/simonzack/urxvt-tabbed/master/screenshots/screenshot.png)
 
 ## Contributing
-
 If you find any bugs or have any feature requests, please open an issue.
 I'm happy to accept any pull requests.
 
