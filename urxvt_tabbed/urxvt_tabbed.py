@@ -30,7 +30,7 @@ class UrxvtTabbedWindow(Gtk.Window):
         self.add(vbox)
 
         # Tabs container
-        notebook = Gtk.Notebook()
+        notebook = Gtk.Notebook(name='notebook')
         notebook.set_can_focus(False)
         notebook.set_scrollable(True)
         vbox.pack_start(notebook, True, True, 0)
@@ -38,6 +38,16 @@ class UrxvtTabbedWindow(Gtk.Window):
         self.notebook.connect('page-removed', self.on_page_removed)
         self.notebook.connect('page-reordered', self.on_page_reordered)
         self.tabs = []
+
+        css = b'''
+        #notebook {
+            border-width: 0px;
+        }
+        '''
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_data(css)
+        context = Gtk.StyleContext()
+        context.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         # New tab button
         new_tab_button = Gtk.Button()
