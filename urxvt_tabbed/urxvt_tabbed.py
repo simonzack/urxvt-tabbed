@@ -69,6 +69,9 @@ class UrxvtTabbedWindow(Gtk.Window):
         # Keyboard shortcuts
         self.connect('key-press-event', self.on_key_press)
 
+        # Set default size for window
+        self.config['ui']['default_size'](self)
+
     def add_terminal(self):
         font = Pango.FontDescription(self.config['ui']['font'])
         notebook = self.notebook

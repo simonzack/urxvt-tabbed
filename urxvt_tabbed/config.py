@@ -1,5 +1,6 @@
 import configparser
 import os
+import re
 from collections import namedtuple
 
 from gi.repository import Gdk
@@ -68,6 +69,20 @@ class Config(dict):
                 keymap[key] = KeyPress.parse(val)
         except KeyError:
             pass
+
+        try:
+            default_size_str = config['ui']['default_size'].strip().lower()
+            default_size = lambda window: window.set_default_size(800, 600)
+            if default_size_str == 'maximize':
+                default_size = lambda window: window.maximize()
+            else:
+                match = re.match(r'(\d+)x(\d+)', default_size_str)
+                if match is not None:
+                    default_size = lambda window: window.set_default_size(int(match.group(1)), int(match.group(2)))
+            config['ui']['default_size'] = default_size
+        except KeyError:
+            pass
+
         return cls(config)
 
 
@@ -113,6 +128,7 @@ class ConfigDefaults(Config):
             },
             'ui': {
                 'font': '',
+                'default_size': '800x600',
             },
         }
         return Config.parse_strings(config)
