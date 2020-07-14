@@ -13,7 +13,6 @@ def main():
     except OSError:
         config = ConfigDefaults.defaults()
     tabbed_window = UrxvtTabbedWindow(config)
-    tabbed_window.maximize()
     tabbed_window.show_all()
     Gtk.main()
 

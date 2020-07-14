@@ -23,6 +23,7 @@ foo = bar
 ### [ui]
 
 - `font`: [font description][font-desc] used for UI, e.g. `Monospace`, `Inconsolata 12` or `Envy Code R italic 16`. Defaults come from GTK.
+- `default_size`: Default window size, e.g. `maximize`, `800x600`. The default size is `800x600`.
 
 [font-desc]: http://www.pygtk.org/docs/pygtk/class-pangofontdescription.html
 
