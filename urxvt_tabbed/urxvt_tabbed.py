@@ -21,6 +21,7 @@ class UrxvtTabbedWindow(Gtk.Window):
 
         # Config
         self.config = config
+        self.close_last_tab_strategy = self.config['general']['close_last_tab']
 
         vbox = Gtk.VBox()
         self.add(vbox)
@@ -53,6 +54,7 @@ class UrxvtTabbedWindow(Gtk.Window):
         new_tab_button.show_all()
         notebook.set_action_widget(new_tab_button, Gtk.PackType.END)
         self.connect('delete_event', self.on_delete_event)
+        signal.signal(signal.SIGINT, lambda signum, frame: self.on_delete_event(None, None))
 
         # Add new tab (otherwise the notebook won't appear)
         self.add_terminal()
@@ -91,6 +93,7 @@ class UrxvtTabbedWindow(Gtk.Window):
         num_tabs = len(children)
         if num_tabs <= 1:
             # Close window if there's only a single tab
+            self.close_last_tab_strategy = 'close'
             Gtk.main_quit()
         else:
             # Ask the user to close all tabs or not
@@ -103,6 +106,7 @@ class UrxvtTabbedWindow(Gtk.Window):
             dialog.add_button('Cancel', Gtk.ResponseType.CANCEL)
             response_code = dialog.run()
             if response_code == Gtk.ResponseType.OK:
+                self.close_last_tab_strategy = 'close'
                 Gtk.main_quit()
             else:
                 dialog.destroy()
@@ -145,12 +149,11 @@ class UrxvtTabbedWindow(Gtk.Window):
         self.tabs.pop(page_num)
         # Check if there are any more terminals left
         if not self.tabs:
-            config_close_last_tab = self.config['general']['close_last_tab']
-            if config_close_last_tab == 'blank':
+            if self.close_last_tab_strategy == 'blank':
                 pass
-            elif config_close_last_tab == 'new':
+            elif self.close_last_tab_strategy == 'new':
                 self.add_terminal()
-            elif config_close_last_tab == 'close':
+            elif self.close_last_tab_strategy == 'close':
                 try:
                     # From gtk 3.10
                     self.close()
@@ -188,6 +191,7 @@ class UrxvtTab:
         # Tab labels
         self.shell_title = title
         self.has_custom_title = False
+        self.closed = False
 
     def update_tab_geometry_hints(self):
         '''
@@ -255,6 +259,8 @@ class UrxvtTab:
         recieves the event.
         '''
         try:
+            if self.closed:
+                return
             if event.type == Gdk.EventType.CONFIGURE:
                 self.update_tab_geometry_hints()
             elif event.type == Gdk.EventType.PROPERTY_NOTIFY:
@@ -280,6 +286,7 @@ class UrxvtTab:
 
     def close(self):
         try:
+            self.closed = True
             # This detaches the gdk event listener as well, see docs for on_gdk_event()
             self.terminal_process.send_signal(signal.SIGINT)
             # Call wait() so there's no defunct process
