@@ -11,10 +11,6 @@ from urxvt_tabbed.tab_label import ClosableTabLabel
 gdk_events = GdkEvents()
 
 
-def is_key_pressed(key, event_key):
-    # Ignore num_lock (Gdk.ModifierType.MOD2_MASK)
-    return event_key.key == key.key and event_key.modifier_flags&(~Gdk.ModifierType.MOD2_MASK) == key.modifier_flags
-
 class UrxvtTabbedWindow(Gtk.Window):
     '''
     Wrapper around urxvt which adds tabs.
@@ -101,7 +97,7 @@ class UrxvtTabbedWindow(Gtk.Window):
             dialog = Gtk.MessageDialog(
                 flags=Gtk.DialogFlags.MODAL,
                 type=Gtk.MessageType.QUESTION,
-                message_format='You are about to close {} tabs. Are you sure you want to continue?'.format(num_tabs)
+                message_format=f'You are about to close {num_tabs} tabs. Are you sure you want to continue?'
             )
             dialog.add_button('Close window', Gtk.ResponseType.OK)
             dialog.add_button('Cancel', Gtk.ResponseType.CANCEL)
@@ -113,27 +109,37 @@ class UrxvtTabbedWindow(Gtk.Window):
                 return True
 
     def on_key_press(self, label_entry, event):
+        is_processed = True
         keymap = self.config['keymap']
-        event_key = KeyPress(event.state, event.keyval)
-        if is_key_pressed(keymap['new_tab'], event_key):
+        event_key = KeyPress.parse_event(event)
+        if event_key == keymap['new_tab']:
             self.add_terminal()
-        elif is_key_pressed(keymap['close_tab'], event_key):
+        elif event_key == keymap['close_tab']:
             self.close_terminal(self.notebook.get_current_page())
-        elif is_key_pressed(keymap['prev_tab'], event_key):
+        elif event_key == keymap['prev_tab']:
             # prev_page() doens't switch to the last tab on the first tab
             self.notebook.set_current_page((self.notebook.get_current_page()-1)%len(self.tabs))
-        elif is_key_pressed(keymap['next_tab'], event_key):
+        elif event_key == keymap['next_tab']:
             self.notebook.set_current_page((self.notebook.get_current_page()+1)%len(self.tabs))
-        elif is_key_pressed(keymap['move_tab_prev'], event_key):
+        elif event_key == keymap['move_tab_prev']:
             old_page_num = self.notebook.get_current_page()
             new_page_num = (old_page_num-1)%len(self.tabs)
             self.notebook.reorder_child(self.tabs[old_page_num].rxvt_socket, new_page_num)
-        elif is_key_pressed(keymap['move_tab_next'], event_key):
+        elif event_key == keymap['move_tab_next']:
             old_page_num = self.notebook.get_current_page()
             new_page_num = (old_page_num+1)%len(self.tabs)
             self.notebook.reorder_child(self.tabs[old_page_num].rxvt_socket, new_page_num)
-        elif is_key_pressed(keymap['edit_tab'], event_key):
+        elif event_key == keymap['edit_tab']:
             self.tabs[self.notebook.get_current_page()].label.label_edit_focus()
+        else:
+            for tab_index in range(10):
+                if event_key == keymap[f'switch_to_tab_{tab_index + 1}']:
+                    if len(self.tabs) > tab_index:
+                        self.notebook.set_current_page(tab_index)
+                    return is_processed
+            is_processed = False
+
+        return is_processed
 
     def on_page_removed(self, notebook, tab_widget, page_num):
         self.tabs.pop(page_num)
