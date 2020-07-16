@@ -3,39 +3,30 @@ import os
 import re
 from collections import namedtuple
 
-from gi.repository import Gdk
+from gi.repository import Gdk, Gtk
 from xdg.BaseDirectory import xdg_config_home
 
 
 class KeyPress(namedtuple('KeyboardShortcut', ('modifier_flags', 'key'))):
     @classmethod
-    def parse(cls, s):
+    def parse_string(cls, s):
         '''
         Allows None values.
         '''
-        s_vals = list(map(str.strip, s.split('+')))
+        key = None
         modifier_flags = 0
-        modifier_map = {
-            'Shift': Gdk.ModifierType.SHIFT_MASK,
-            'Control': Gdk.ModifierType.CONTROL_MASK,
-            'Alt': Gdk.ModifierType.MOD1_MASK,
-            'Super': Gdk.ModifierType.SUPER_MASK,
-            'Hyper': Gdk.ModifierType.HYPER_MASK,
-            'Meta': Gdk.ModifierType.META_MASK,
-        }
+        s_vals = list(map(str.strip, s.split('+')))
         if s_vals:
-            for modifier in s_vals[:-1]:
-                try:
-                    modifier_flags |= modifier_map[modifier]
-                except KeyError:
-                    raise ValueError('unknown modifier', modifier)
-            try:
-                key = getattr(Gdk, 'KEY_{}'.format(s_vals[-1]))
-            except AttributeError:
-                raise ValueError('unknown key')
-        else:
-            key = None
+            accelerator = ''.join([f'<{modifier}>' for modifier in s_vals[:-1]] + s_vals[-1:])
+            key, modifier_flags = Gtk.accelerator_parse(accelerator)
+            if key == 0 and modifier_flags == 0:
+                raise ValueError(f'failed parsing shortcut: {s}')
         return cls(modifier_flags, key)
+
+    @classmethod
+    def parse_event(cls, event):
+        # Ignore num_lock (Gdk.ModifierType.MOD2_MASK)
+        return cls(event.state & (~Gdk.ModifierType.MOD2_MASK), Gdk.keyval_to_lower(event.keyval))
 
 
 class Config(dict):
@@ -66,7 +57,7 @@ class Config(dict):
         try:
             keymap = config['keymap']
             for key, val in keymap.items():
-                keymap[key] = KeyPress.parse(val)
+                keymap[key] = KeyPress.parse_string(val)
         except KeyError:
             pass
 
@@ -125,6 +116,16 @@ class ConfigDefaults(Config):
                 'new_tab': 'Control + Shift + T',
                 'close_tab': 'Control + F4',
                 'edit_tab': 'Control + Shift + E',
+                'switch_to_tab_1': 'Alt + 1',
+                'switch_to_tab_2': 'Alt + 2',
+                'switch_to_tab_3': 'Alt + 3',
+                'switch_to_tab_4': 'Alt + 4',
+                'switch_to_tab_5': 'Alt + 5',
+                'switch_to_tab_6': 'Alt + 6',
+                'switch_to_tab_7': 'Alt + 7',
+                'switch_to_tab_8': 'Alt + 8',
+                'switch_to_tab_9': 'Alt + 9',
+                'switch_to_tab_10': 'Alt + 0',
             },
             'ui': {
                 'font': '',
