@@ -33,7 +33,7 @@ foo = bar
 
 ### [general]
 
-- `close_last_tab`: One of `new`, `close`, `blank`
+- `close_last_tab`: One of `open_new_tab`, `close_application`
 
 ### [keymap]
 

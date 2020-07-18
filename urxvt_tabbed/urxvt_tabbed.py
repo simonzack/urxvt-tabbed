@@ -93,7 +93,7 @@ class UrxvtTabbedWindow(Gtk.Window):
         num_tabs = len(children)
         if num_tabs <= 1:
             # Close window if there's only a single tab
-            self.close_last_tab_strategy = 'close'
+            self.close_last_tab_strategy = 'close_application'
             Gtk.main_quit()
         else:
             # Ask the user to close all tabs or not
@@ -106,7 +106,7 @@ class UrxvtTabbedWindow(Gtk.Window):
             dialog.add_button('Cancel', Gtk.ResponseType.CANCEL)
             response_code = dialog.run()
             if response_code == Gtk.ResponseType.OK:
-                self.close_last_tab_strategy = 'close'
+                self.close_last_tab_strategy = 'close_application'
                 Gtk.main_quit()
             else:
                 dialog.destroy()
@@ -149,11 +149,9 @@ class UrxvtTabbedWindow(Gtk.Window):
         self.tabs.pop(page_num)
         # Check if there are any more terminals left
         if not self.tabs:
-            if self.close_last_tab_strategy == 'blank':
-                pass
-            elif self.close_last_tab_strategy == 'new':
+            if self.close_last_tab_strategy == 'open_new_tab':
                 self.add_terminal()
-            elif self.close_last_tab_strategy == 'close':
+            elif self.close_last_tab_strategy == 'close_application':
                 try:
                     # From gtk 3.10
                     self.close()
